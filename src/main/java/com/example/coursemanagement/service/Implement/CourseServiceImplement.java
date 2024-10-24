@@ -1,15 +1,15 @@
 package com.example.coursemanagement.service.Implement;
 
 import com.example.coursemanagement.data.DTO.CourseDTO;
-import com.example.coursemanagement.data.DTO.UserDTO;
 import com.example.coursemanagement.data.entity.CourseEntity;
-import com.example.coursemanagement.data.entity.UserEntity;
+import com.example.coursemanagement.exception.AppException;
+import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.repository.CourseRepository;
 import com.example.coursemanagement.service.CourseService;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +22,38 @@ public class CourseServiceImplement implements CourseService {
     public List<CourseDTO> getAllCourse(){
         List<CourseEntity> courses = courseRepository.findAll();
         return courses.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public CourseDTO doSaveCourse(CourseDTO courseDTO) throws SQLException, AppException {
+        CourseEntity courseEntity = convertToEntity(courseDTO);
+        courseEntity = courseRepository.save(courseEntity);
+        return convertToDto(courseEntity);
+    }
+
+    @Override
+    public CourseDTO updateCourse(CourseDTO courseDTO) throws SQLException, AppException {
+        var courseEntityOptional = courseRepository.findById(courseDTO.getCourseId());
+        if (courseEntityOptional.isEmpty()) {
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course Not Found");
+        }
+
+        CourseEntity existingCourse = courseEntityOptional.get();
+
+        existingCourse.setTitle(courseDTO.getTitle());
+        existingCourse.setDescription(courseDTO.getDescription());
+        existingCourse.setImgUrl(courseDTO.getImgUrl());
+        existingCourse.setStartDate(courseDTO.getStartDate());
+        existingCourse.setEndDate(courseDTO.getEndDate());
+        existingCourse.setMeetingTime(courseDTO.getMeetingTime());
+        existingCourse.setSchedule(courseDTO.getSchedule());
+        existingCourse.setPrice(courseDTO.getPrice());
+        existingCourse.setStatus(courseDTO.getStatus());
+        existingCourse.setInstructor(courseDTO.getInstructor());
+
+        CourseEntity updatedCourse = courseRepository.save(existingCourse);
+
+        return convertToDto(updatedCourse);
     }
 
     private CourseDTO convertToDto(CourseEntity courseEntity) {
@@ -37,6 +69,7 @@ public class CourseServiceImplement implements CourseService {
                 .price(courseEntity.getPrice())
                 .status(courseEntity.getStatus())
                 .createdAt(courseEntity.getCreatedAt())
+                .instructor(courseEntity.getInstructor())
                 .build();
     }
 
@@ -52,6 +85,8 @@ public class CourseServiceImplement implements CourseService {
         courseEntity.setSchedule(courseDTO.getSchedule());
         courseEntity.setPrice(courseDTO.getPrice());
         courseEntity.setStatus(courseDTO.getStatus());
+        courseEntity.setInstructor(courseDTO.getInstructor());
+
         return courseEntity;
     }
 
