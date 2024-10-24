@@ -1,8 +1,12 @@
 package com.example.coursemanagement.api;
 
 
+import com.example.coursemanagement.constant.ApiMessage;
+import com.example.coursemanagement.data.DTO.CourseDTO;
+import com.example.coursemanagement.data.DTO.UserDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.CourseService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,19 +53,35 @@ public class CourseManagementApi {
         }
         return ResponseEntity.ok(result);
     }
-    @PostMapping("/postSaveCourse")
-    public ResponseEntity<?> doPostSaveCourse(){
-        Map<String, Object> result = new HashMap<>();
+    @PostMapping("/saveCourse")
+    public ResponseObject<?> doPostSaveUser(@Valid @RequestBody CourseDTO courseDTO) {
+        var resultApi = new ResponseObject<>();
         try {
-            result.put("status", true);
-            result.put("message", "Post Save Course Success");
-            result.put("data", null);
-        } catch (Exception e){
-            result.put("status", false);
-            result.put("message", "Post Save Course Fail");
-            result.put("data", null);
-            log.error("Fail When Call API course-api/postSaveCourse ", e);
+            var addedCourse = courseService.doSaveCourse(courseDTO);
+            resultApi.setData(addedCourse);
+            resultApi.setSuccess(true);
+            resultApi.setMessage(ApiMessage.BasicMessageApi.SUCCESS.getBasicMessageApi());
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(ApiMessage.BasicMessageApi.FAIL.getBasicMessageApi());
+            log.error("Failed to add product: ", e);
         }
-        return ResponseEntity.ok(result);
+        return resultApi;
+    }
+
+    @PutMapping("/updateCourse")
+    public ResponseObject<?> doPutUpdateCourse(@Valid @RequestBody CourseDTO courseDTO) {
+        var resultApi = new ResponseObject<>();
+        try {
+            var updatedCourse = courseService.updateCourse(courseDTO);
+            resultApi.setData(updatedCourse);
+            resultApi.setSuccess(true);
+            resultApi.setMessage(ApiMessage.BasicMessageApi.SUCCESS.getBasicMessageApi());
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(ApiMessage.BasicMessageApi.FAIL.getBasicMessageApi());
+            log.error("Failed to update course: ", e);
+        }
+        return resultApi;
     }
 }
