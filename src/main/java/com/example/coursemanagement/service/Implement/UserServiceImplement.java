@@ -1,5 +1,6 @@
 package com.example.coursemanagement.service.Implement;
 
+import com.example.coursemanagement.data.DTO.PasswordChangeDTO;
 import com.example.coursemanagement.data.DTO.UserDTO;
 import com.example.coursemanagement.data.entity.RoleEntity;
 import com.example.coursemanagement.data.entity.UserEntity;
@@ -88,22 +89,23 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public void changePassword(Integer userId, String oldPassword, String newPassword) {
-        Optional<UserEntity> userEntityOptional = userRepository.findById(userId);
+    public void changePassword(PasswordChangeDTO passwordChangeDTO) {
+        Optional<UserEntity> userEntityOptional = userRepository.findById(passwordChangeDTO.getUserId());
 
         if (userEntityOptional.isPresent()) {
             UserEntity userEntity = userEntityOptional.get();
 
-            // Verify the old password
-            if (!passwordEncoder.matches(oldPassword, userEntity.getPasswordHash())) {
+            if (!passwordEncoder.matches(passwordChangeDTO.getCurrentPassword(), userEntity.getPasswordHash())) {
                 throw new AppException(ErrorCode.INVALID_CREDENTIALS, "Current password is incorrect");
             }
 
-            // Encode the new password and update
-            String encodedNewPassword = passwordEncoder.encode(newPassword);
+            if (!passwordChangeDTO.getNewPassword().equals(passwordChangeDTO.getConfirmPassword())) {
+                throw new AppException(ErrorCode.PASSWORDS_DO_NOT_MATCH, "New password and confirm password do not match");
+            }
+
+            String encodedNewPassword = passwordEncoder.encode(passwordChangeDTO.getNewPassword());
             userEntity.setPasswordHash(encodedNewPassword);
             userRepository.save(userEntity);
-
         } else {
             throw new AppException(ErrorCode.USER_NOT_FOUND, "User not found");
         }
@@ -115,7 +117,7 @@ public class UserServiceImplement implements UserService {
                 .name(userEntity.getName())
                 .phone(userEntity.getPhone())
                 .email(userEntity.getEmail())
-                .passwordHash(userEntity.getPasswordHash()) // Nếu không cần trả về, có thể bỏ
+//                .passwordHash(userEntity.getPasswordHash())
                 .avatarUrl(userEntity.getAvatarUrl())
                 .registrationDate(userEntity.getRegistrationDate())
                 .status(userEntity.getStatus())
@@ -134,7 +136,6 @@ public class UserServiceImplement implements UserService {
         userEntity.setRegistrationDate(userDTO.getRegistrationDate());
         userEntity.setStatus(userDTO.getStatus());
 
-        // Thiết lập RoleEntity nếu roleId khác null
         if (userDTO.getRoleId() != null) {
             RoleEntity roleEntity = new RoleEntity();
             roleEntity.setRoleId(userDTO.getRoleId());

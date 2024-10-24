@@ -1,5 +1,6 @@
 package com.example.coursemanagement.api;
 
+import com.example.coursemanagement.data.DTO.PasswordChangeDTO;
 import com.example.coursemanagement.data.DTO.UserDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.UserService;
@@ -79,16 +80,16 @@ public class UserApi {
     }
 
     @PostMapping("/changePassword")
-    public ResponseObject<?> changePassword(@RequestParam Integer userId, @RequestParam String oldPassword, @RequestParam String newPassword) {
+    public ResponseObject<?> changePassword(@RequestBody PasswordChangeDTO passwordChangeDTO) {
         var resultApi = new ResponseObject<>();
         try {
-            userService.changePassword(userId, oldPassword, newPassword);
+            userService.changePassword(passwordChangeDTO);
             resultApi.setSuccess(true);
             resultApi.setMessage("Password changed successfully");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API user-api/changePassword ", e);
+            log.error("Fail When Call API user-api/changePassword", e);
         }
         return resultApi;
     }

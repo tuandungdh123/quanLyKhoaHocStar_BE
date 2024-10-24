@@ -9,6 +9,8 @@ public enum ErrorCode {
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
     public static final String INVALID_CREDENTIALS = "INVALID_CREDENTIALS";
     public static final String USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
+    public static final String COURSE_NOT_FOUND = "COURSE_NOT_FOUND";
+    public static final String PASSWORDS_DO_NOT_MATCH = "PASSWORDS_DO_NOT_MATCH";
 
     private int code;
     private String message;
