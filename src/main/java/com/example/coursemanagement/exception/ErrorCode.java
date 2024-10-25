@@ -12,6 +12,7 @@ public enum ErrorCode {
     public static final String COURSE_NOT_FOUND = "COURSE_NOT_FOUND";
     public static final String PASSWORDS_DO_NOT_MATCH = "PASSWORDS_DO_NOT_MATCH";
 
+
     private int code;
     private String message;
 
