@@ -32,11 +32,23 @@ public class CourseServiceImplement implements CourseService {
     }
 
     @Override
+    public void deleteCourseById(Integer courseId) throws SQLException, AppException {
+        var courseEntityOptional = courseRepository.findById(courseId);
+        if (courseEntityOptional.isEmpty()) {
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course not found");
+        }
+
+        courseRepository.deleteById(courseId);
+    }
+
+    @Override
     public CourseDTO updateCourse(CourseDTO courseDTO) throws SQLException, AppException {
         var courseEntityOptional = courseRepository.findById(courseDTO.getCourseId());
         if (courseEntityOptional.isEmpty()) {
             throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course Not Found");
         }
+
+
 
         CourseEntity existingCourse = courseEntityOptional.get();
 
