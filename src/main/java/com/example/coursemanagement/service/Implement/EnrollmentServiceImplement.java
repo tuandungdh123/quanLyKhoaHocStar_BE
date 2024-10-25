@@ -37,11 +37,8 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         EnrollmentEntity enrollmentEntity = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid enrollment ID"));
 
-        // Cập nhật status và payment status
         enrollmentEntity.setStatus(EnrollmentEntity.EnrollmentStatus.valueOf(status.name()));
-        enrollmentEntity.setPaymentStatus(EnrollmentEntity.PaymentStatus.valueOf(paymentStatus.name()));
-
-        // Lưu lại bản ghi đã cập nhật
+//        enrollmentEntity.setPaymentStatus(EnrollmentEntity.PaymentStatus.valueOf(paymentStatus.name()));
         EnrollmentEntity updatedEntity = enrollmentRepository.save(enrollmentEntity);
 
         return convertToDTO(updatedEntity);
@@ -52,8 +49,6 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         dto.setEnrollmentId(enrollmentEntity.getEnrollmentId());
         dto.setUserId(enrollmentEntity.getUser().getUserId());
         dto.setCourseId(enrollmentEntity.getCourse().getCourseId());
-
-        // Chuyển đổi giữa enum của Entity và DTO
         dto.setStatus(EnrollmentDTO.EnrollmentStatus.valueOf(enrollmentEntity.getStatus().name()));
         dto.setEnrollmentDate(enrollmentEntity.getEnrollmentDate());
         dto.setPaymentStatus(EnrollmentDTO.PaymentStatus.valueOf(enrollmentEntity.getPaymentStatus().name()));
@@ -72,8 +67,6 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         entity.setEnrollmentId(enrollmentDTO.getEnrollmentId());
         entity.setUser(user);
         entity.setCourse(course);
-
-        // Chuyển đổi giữa enum của DTO và Entity
         entity.setStatus(EnrollmentEntity.EnrollmentStatus.valueOf(enrollmentDTO.getStatus().name()));
         entity.setEnrollmentDate(enrollmentDTO.getEnrollmentDate());
         entity.setPaymentStatus(EnrollmentEntity.PaymentStatus.valueOf(enrollmentDTO.getPaymentStatus().name()));
