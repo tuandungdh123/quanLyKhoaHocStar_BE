@@ -1,5 +1,7 @@
 package com.example.coursemanagement.data.entity;
 
+
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,13 +38,13 @@ public class EnrollmentEntity {
     private PaymentStatus paymentStatus;
 
     public enum EnrollmentStatus {
-        COMPLETED,
-        IN_PROGRESS
+        completed,
+        in_progress
     }
 
     public enum PaymentStatus {
-        PENDING,
-        COMPLETED,
-        FAILED
+        pending,
+        completed,
+        failed
     }
 }
