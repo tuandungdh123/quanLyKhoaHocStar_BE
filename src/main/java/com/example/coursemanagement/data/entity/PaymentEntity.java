@@ -31,8 +31,8 @@ public class PaymentEntity {
     private String transactionId;
 
     public enum PaymentStatus {
-        PENDING,
-        COMPLETED,
-        FAILED
+        pending,
+        completed,
+        failed
     }
 }
