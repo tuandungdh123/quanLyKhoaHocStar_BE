@@ -69,6 +69,21 @@ public class CourseManagementApi {
         return resultApi;
     }
 
+    @DeleteMapping("/deleteCourse/{courseId}")
+    public ResponseObject<?> doDeleteCourse(@PathVariable Integer courseId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            courseService.deleteCourseById(courseId);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Delete course success");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage("Delete course failed: " + e.getMessage());
+            log.error("Failed to delete course: ", e);
+        }
+        return resultApi;
+    }
+
     @PutMapping("/updateCourse")
     public ResponseObject<?> doPutUpdateCourse(@Valid @RequestBody CourseDTO courseDTO) {
         var resultApi = new ResponseObject<>();
