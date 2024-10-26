@@ -3,7 +3,6 @@ package com.example.coursemanagement.api;
 
 import com.example.coursemanagement.constant.ApiMessage;
 import com.example.coursemanagement.data.DTO.CourseDTO;
-import com.example.coursemanagement.data.DTO.UserDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.CourseService;
 import jakarta.validation.Valid;
@@ -54,7 +53,7 @@ public class CourseManagementApi {
         return ResponseEntity.ok(result);
     }
     @PostMapping("/saveCourse")
-    public ResponseObject<?> doPostSaveUser(@Valid @RequestBody CourseDTO courseDTO) {
+    public ResponseObject<?> doPostSaveCourse(@Valid @RequestBody CourseDTO courseDTO) {
         var resultApi = new ResponseObject<>();
         try {
             var addedCourse = courseService.doSaveCourse(courseDTO);
