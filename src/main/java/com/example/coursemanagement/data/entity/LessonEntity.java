@@ -30,7 +30,7 @@ public class LessonEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LessonStatus status = LessonStatus.NOT_COMPLETED;
+    private LessonStatus status = LessonStatus.not_completed;
 
     @Column(name = "order_number", nullable = false)
     private Integer orderNumber;
@@ -39,7 +39,7 @@ public class LessonEntity {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public enum LessonStatus {
-        COMPLETED,
-        NOT_COMPLETED
+        completed,
+        not_completed,
     }
 }
