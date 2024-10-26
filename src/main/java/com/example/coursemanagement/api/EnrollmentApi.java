@@ -16,8 +16,8 @@ public class EnrollmentApi {
     @Autowired
     private EnrollmentService enrollmentService;
 
-    @GetMapping("/getAllModule")
-    public ResponseObject<?> doGetAllCourse() {
+    @GetMapping("/getAllEnrollment")
+    public ResponseObject<?> doGetAllEnrollment() {
         var resultApi = new ResponseObject<>();
         try {
             resultApi.setData(enrollmentService.getAllEnrollments());
