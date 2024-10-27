@@ -6,5 +6,8 @@ import java.util.List;
 
 public interface EnrollmentService {
     List<EnrollmentDTO> getAllEnrollments();
-    EnrollmentDTO updateEnrollmentStatus(Integer enrollmentId, EnrollmentDTO.EnrollmentStatus status, EnrollmentDTO.PaymentStatus paymentStatus);
+
+    EnrollmentDTO updateEnrollmentStatus(EnrollmentDTO enrollmentDTO);
+
+    EnrollmentDTO getEnrollmentById(Integer enrollmentId);
 }
