@@ -3,6 +3,8 @@ package com.example.coursemanagement.service.Implement;
 import com.example.coursemanagement.data.DTO.LessonDTO;
 import com.example.coursemanagement.data.entity.LessonEntity;
 import com.example.coursemanagement.data.entity.ModuleEntity;
+import com.example.coursemanagement.exception.AppException;
+import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.repository.LessonRepository;
 import com.example.coursemanagement.repository.ModuleRepository;
 import com.example.coursemanagement.service.LessonService;
@@ -27,9 +29,12 @@ public class LessonServiceImplement implements LessonService {
 
 
     public LessonDTO convertToDTO(LessonEntity lessonEntity) {
+        if (lessonEntity == null) {
+            return null;
+        }
         return LessonDTO.builder()
                 .lessonId(lessonEntity.getLessonId())
-                .module(lessonEntity.getModule().getModuleId()) // Assuming ModuleEntity has a getModuleId method
+                .module(lessonEntity.getModule().getModuleId())
                 .title(lessonEntity.getTitle())
                 .content(lessonEntity.getContent())
                 .videoUrl(lessonEntity.getVideoUrl())
@@ -64,6 +69,21 @@ public class LessonServiceImplement implements LessonService {
     @Override
     public void deleteLesson(Integer lessonId) {
         lessonRepository.deleteById(lessonId);
+    }
+
+    @Override
+    public LessonDTO getLessonById(Integer lessonId) {
+        var lessonEntityOptional = lessonRepository.findByLessonId(lessonId);
+        if (lessonEntityOptional.isEmpty()) {
+            throw new AppException(ErrorCode.LESSON_NOT_FOUND, "Lesson not found");
+        }
+        return convertToDTO(lessonEntityOptional.get());
+    }
+
+    @Override
+    public List<LessonDTO> getLessonsByModuleId(Integer moduleId) {
+        List<LessonEntity> lessons = lessonRepository.findByModule_ModuleId(moduleId);
+        return lessons.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public LessonEntity convertToEntity(LessonDTO lessonDTO) {
