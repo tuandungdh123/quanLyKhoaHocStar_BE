@@ -1,6 +1,5 @@
 package com.example.coursemanagement.api;
 
-
 import com.example.coursemanagement.data.DTO.EnrollmentDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.EnrollmentService;
@@ -13,41 +12,53 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/enrollment")
 @CrossOrigin(origins = "*")
 public class EnrollmentApi {
+
     @Autowired
     private EnrollmentService enrollmentService;
 
-    @GetMapping("/getAllEnrollment")
-    public ResponseObject<?> doGetAllEnrollment() {
+    @GetMapping("/getAll")
+    public ResponseObject<?> getAllEnrollments() {
         var resultApi = new ResponseObject<>();
         try {
             resultApi.setData(enrollmentService.getAllEnrollments());
             resultApi.setSuccess(true);
-            resultApi.setMessage("getAllModule success");
+            resultApi.setMessage("Fetched all enrollments successfully");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/module/getAllCourse ", e);
+            log.error("Error in /api/v1/enrollment/getAll", e);
         }
         return resultApi;
     }
-    @PutMapping("/updateStatus/{enrollmentId}")
-    public ResponseObject<?> updateEnrollmentStatus(
-            @PathVariable Integer enrollmentId,
-            @RequestBody EnrollmentDTO enrollmentDTO) {
+
+    @GetMapping("/getEnrollmentById")
+    public ResponseObject<?> getEnrollmentById(@RequestParam("enrollmentId") Integer enrollmentId) {
         var resultApi = new ResponseObject<>();
         try {
-            EnrollmentDTO updatedEnrollment = enrollmentService.updateEnrollmentStatus(
-                    enrollmentId,
-                    enrollmentDTO.getStatus(),
-                    enrollmentDTO.getPaymentStatus()
-            );
-            resultApi.setData(updatedEnrollment);
+            EnrollmentDTO enrollmentDTO = enrollmentService.getEnrollmentById(enrollmentId);
+            resultApi.setData(enrollmentDTO);
             resultApi.setSuccess(true);
-            resultApi.setMessage("Update status success");
+            resultApi.setMessage("Fetched enrollment successfully");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Failed to update enrollment status for ID: {}", enrollmentId, e);
+            log.error("Failed to get enrollment by ID: {}", enrollmentId, e);
+        }
+        return resultApi;
+    }
+
+    @PutMapping("/updateStatus")
+    public ResponseObject<?> updateEnrollmentStatus(@RequestBody EnrollmentDTO enrollmentDTO) {
+        var resultApi = new ResponseObject<>();
+        try {
+            EnrollmentDTO updatedEnrollment = enrollmentService.updateEnrollmentStatus(enrollmentDTO);
+            resultApi.setData(updatedEnrollment);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Enrollment status updated successfully");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Failed to update enrollment status", e);
         }
         return resultApi;
     }

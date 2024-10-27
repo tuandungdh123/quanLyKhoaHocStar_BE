@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 @Builder
 public class EnrollmentDTO {
     private Integer enrollmentId;
-    private Integer userId; // Sử dụng ID thay vì entity để DTO gọn nhẹ hơn
+    private Integer userId;
+    private String userName;
     private Integer courseId;
+    private String title;
     private EnrollmentStatus status;
     private LocalDateTime enrollmentDate;
     private PaymentStatus paymentStatus;
