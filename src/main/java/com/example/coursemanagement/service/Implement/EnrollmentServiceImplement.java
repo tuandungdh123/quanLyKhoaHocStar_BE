@@ -37,9 +37,9 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     }
 
     @Override
-    public Optional<EnrollmentDTO> getEnrollmentsByCourseId(Integer courseId) {
-        Optional<EnrollmentEntity> enrollments = enrollmentRepository.findByCourse_CourseId(courseId);
-        return enrollments.map(this::convertToDTO);
+    public List<EnrollmentDTO> getEnrollmentsByCourseId(Integer courseId) {
+        List<EnrollmentEntity> enrollments = enrollmentRepository.findByCourse_CourseId(courseId);
+        return enrollments.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Override

@@ -12,7 +12,7 @@ public interface EnrollmentService {
 
     EnrollmentDTO getEnrollmentById(Integer enrollmentId);
 
-    Optional<EnrollmentDTO> getEnrollmentsByCourseId(Integer courseId);
+    List<EnrollmentDTO> getEnrollmentsByCourseId(Integer courseId);
 
     EnrollmentDTO addEnrollment(EnrollmentDTO enrollmentDTO);
 }
