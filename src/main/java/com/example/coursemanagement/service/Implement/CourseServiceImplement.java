@@ -25,6 +25,15 @@ public class CourseServiceImplement implements CourseService {
     }
 
     @Override
+    public CourseDTO getCourseById(Integer courseId) throws AppException {
+        var courseEntityOptional = courseRepository.findByCourseId(courseId);
+        if (courseEntityOptional.isEmpty()) {
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course not found");
+        }
+        return convertToDto(courseEntityOptional.get());
+    }
+
+    @Override
     public CourseDTO doSaveCourse(CourseDTO courseDTO) throws SQLException, AppException {
         CourseEntity courseEntity = convertToEntity(courseDTO);
         courseEntity = courseRepository.save(courseEntity);
