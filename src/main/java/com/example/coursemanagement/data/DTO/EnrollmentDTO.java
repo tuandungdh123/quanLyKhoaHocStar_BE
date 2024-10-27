@@ -17,7 +17,9 @@ public class EnrollmentDTO {
     private String userName;
     private Integer courseId;
     private String courseName;
+    private String description;
     private String title;
+    private String imgUrl;
     private EnrollmentStatus status;
     private LocalDateTime enrollmentDate = Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime();
     private PaymentStatus paymentStatus;

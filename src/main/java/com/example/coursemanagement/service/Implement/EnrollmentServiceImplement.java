@@ -105,6 +105,8 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         dto.setUserName(enrollmentEntity.getUser().getName());
         dto.setCourseId(enrollmentEntity.getCourse().getCourseId());
         dto.setCourseName(enrollmentEntity.getCourse().getTitle());
+        dto.setImgUrl(enrollmentEntity.getCourse().getImgUrl());
+        dto.setDescription(enrollmentEntity.getCourse().getDescription());
         dto.setTitle(enrollmentEntity.getCourse().getTitle());
         dto.setStatus(EnrollmentDTO.EnrollmentStatus.valueOf(enrollmentEntity.getStatus().name()));
         dto.setEnrollmentDate(enrollmentEntity.getEnrollmentDate());
