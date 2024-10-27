@@ -2,6 +2,7 @@ package com.example.coursemanagement.api;
 
 import com.example.coursemanagement.data.DTO.PasswordChangeDTO;
 import com.example.coursemanagement.data.DTO.UserDTO;
+import com.example.coursemanagement.data.DTO.VerifyOtpRequestDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +40,27 @@ public class UserApi {
             resultApi.setSuccess(true);
             resultApi.setMessage("Registration successful");
             resultApi.setData(userDTO);
+
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
             log.error("Fail When Call API user-api/register ", e);
+        }
+        return resultApi;
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseObject<?> verifyOtp(@RequestBody VerifyOtpRequestDTO request) {
+        String email = request.getEmail();
+        String otp = request.getOtp();
+
+        var resultApi = new ResponseObject<>();
+        if (userService.verifyOtp(email, otp)) {
+            resultApi.setSuccess(true);
+            resultApi.setMessage("OTP verification successful.");
+        } else {
+            resultApi.setSuccess(false);
+            resultApi.setMessage("Invalid OTP or OTP has expired.");
         }
         return resultApi;
     }
