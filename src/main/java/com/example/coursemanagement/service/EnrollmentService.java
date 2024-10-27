@@ -14,4 +14,6 @@ public interface EnrollmentService {
     List<EnrollmentDTO> getEnrollmentsByCourseId(Integer courseId);
 
     EnrollmentDTO addEnrollment(EnrollmentDTO enrollmentDTO);
+
+    List<EnrollmentDTO> getAllEnrollmentsByUserId(Integer userId);
 }
