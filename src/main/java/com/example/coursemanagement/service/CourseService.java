@@ -14,4 +14,6 @@ public interface CourseService {
     CourseDTO doSaveCourse(CourseDTO courseDTO) throws SQLException, AppException;
 
     void deleteCourseById(Integer courseId) throws SQLException, AppException;
+
+    CourseDTO getCourseById(Integer courseId);
 }
