@@ -18,7 +18,7 @@ public class UserDTO {
     private String phone;
     private String email;
     private String passwordHash;
-    private String avatarUrl = "avatar.png";
+    private String avatarUrl = "avatarDefault.jpg";
     private Integer roleId = 2;
     private Timestamp registrationDate = Timestamp.valueOf(LocalDateTime.now());
     private Boolean status = true;
