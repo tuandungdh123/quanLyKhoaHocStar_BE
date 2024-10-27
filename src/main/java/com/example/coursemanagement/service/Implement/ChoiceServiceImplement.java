@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChoiceServiceImplement implements ChoiceService {
     @Autowired
-    private ChoiceRepository choiceRepository;
+    private final ChoiceRepository choiceRepository;
 
     @Autowired
-    private QuestionRepository questionRepository;
+    private final QuestionRepository questionRepository;
 
     @Override
     public List<ChoiceDTO> getAllChoices() {
@@ -42,7 +42,7 @@ public class ChoiceServiceImplement implements ChoiceService {
     @Override
     public ChoiceDTO createChoice(ChoiceDTO choiceDTO) {
         QuestionEntity question = questionRepository.findById(choiceDTO.getQuestionId())
-                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Choice not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Question not found"));
 
         ChoiceEntity entity = toEntity(choiceDTO, question);
         ChoiceEntity savedEntity = choiceRepository.save(entity);
@@ -50,12 +50,12 @@ public class ChoiceServiceImplement implements ChoiceService {
     }
 
     @Override
-    public ChoiceDTO updateChoice(Integer choiceId, ChoiceDTO choiceDTO) {
-        ChoiceEntity existingEntity = choiceRepository.findById(choiceId)
+    public ChoiceDTO updateChoice(ChoiceDTO choiceDTO) {
+        ChoiceEntity existingEntity = choiceRepository.findById(choiceDTO.getChoiceId())
                 .orElseThrow(() -> new AppException(ErrorCode.CHOICE_NOT_FOUND, "Choice not found"));
 
         QuestionEntity question = questionRepository.findById(choiceDTO.getQuestionId())
-                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Choice not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Question not found"));
 
         existingEntity.setChoiceText(choiceDTO.getChoiceText());
         existingEntity.setIsCorrect(choiceDTO.getIsCorrect());
