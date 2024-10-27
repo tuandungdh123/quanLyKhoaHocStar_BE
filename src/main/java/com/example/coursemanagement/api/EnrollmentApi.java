@@ -62,4 +62,36 @@ public class EnrollmentApi {
         }
         return resultApi;
     }
+
+    @GetMapping("/getEnrollmentByCourseId")
+    public ResponseObject<?> getEnrollmentsByCourseId(@RequestParam("courseId") Integer courseId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            var enrollments = enrollmentService.getEnrollmentsByCourseId(courseId);
+            resultApi.setData(enrollments);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Fetched enrollments for course successfully");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Failed to get enrollments by course ID: {}", courseId, e);
+        }
+        return resultApi;
+    }
+
+    @PostMapping("/addEnrollment")
+    public ResponseObject<?> addEnrollment(@RequestBody EnrollmentDTO enrollmentDTO) {
+        var resultApi = new ResponseObject<>();
+        try {
+            EnrollmentDTO newEnrollment = enrollmentService.addEnrollment(enrollmentDTO);
+            resultApi.setData(newEnrollment);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Enrollment added successfully");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Failed to add enrollment", e);
+        }
+        return resultApi;
+    }
 }
