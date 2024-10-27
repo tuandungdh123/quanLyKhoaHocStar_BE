@@ -19,7 +19,7 @@ public class UserDTO {
     private String email;
     private String passwordHash;
     private String avatarUrl = "avatarDefault.jpg";
-    private Integer roleId = 2;
+    private Integer roleId = 3;
     private Timestamp registrationDate = Timestamp.valueOf(LocalDateTime.now());
     private Boolean status = true;
 }
