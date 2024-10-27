@@ -10,4 +10,8 @@ public interface EnrollmentService {
     EnrollmentDTO updateEnrollmentStatus(EnrollmentDTO enrollmentDTO);
 
     EnrollmentDTO getEnrollmentById(Integer enrollmentId);
+
+    List<EnrollmentDTO> getEnrollmentsByCourseId(Integer courseId);
+
+    EnrollmentDTO addEnrollment(EnrollmentDTO enrollmentDTO);
 }

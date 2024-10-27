@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.example.coursemanagement.security.OtpUtil.generateOtp;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImplement implements UserService {
@@ -46,6 +48,12 @@ public class UserServiceImplement implements UserService {
 
         String encodedPassword = passwordEncoder.encode(userDTO.getPasswordHash());
         userDTO.setPasswordHash(encodedPassword);
+
+        String otp = generateOtp();
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(5);
+        otpStorage.put(userDTO.getEmail(), new OtpInfo(otp, expiryTime));
+
+        sendOtpEmail(userDTO.getEmail(), otp);
 
         UserEntity userEntity = convertToEntity(userDTO);
         userRepository.save(userEntity);

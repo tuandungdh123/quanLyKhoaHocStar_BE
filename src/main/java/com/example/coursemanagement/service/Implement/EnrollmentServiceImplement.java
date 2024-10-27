@@ -36,6 +36,21 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     }
 
     @Override
+    public List<EnrollmentDTO> getEnrollmentsByCourseId(Integer courseId) {
+        List<EnrollmentEntity> enrollments = enrollmentRepository.findByCourse_CourseId(courseId);
+        return enrollments.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EnrollmentDTO addEnrollment(EnrollmentDTO enrollmentDTO) {
+        EnrollmentEntity enrollmentEntity = convertToEntity(enrollmentDTO);
+        EnrollmentEntity savedEntity = enrollmentRepository.save(enrollmentEntity);
+        return convertToDTO(savedEntity);
+    }
+
+    @Override
     public EnrollmentDTO updateEnrollmentStatus(EnrollmentDTO enrollmentDTO) {
         EnrollmentEntity enrollmentEntity = enrollmentRepository.findById(enrollmentDTO.getEnrollmentId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid enrollment ID"));
@@ -58,6 +73,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         dto.setUserId(enrollmentEntity.getUser().getUserId());
         dto.setUserName(enrollmentEntity.getUser().getName());
         dto.setCourseId(enrollmentEntity.getCourse().getCourseId());
+        dto.setCourseName(enrollmentEntity.getCourse().getTitle());
         dto.setTitle(enrollmentEntity.getCourse().getTitle());
         dto.setStatus(EnrollmentDTO.EnrollmentStatus.valueOf(enrollmentEntity.getStatus().name()));
         dto.setEnrollmentDate(enrollmentEntity.getEnrollmentDate());
