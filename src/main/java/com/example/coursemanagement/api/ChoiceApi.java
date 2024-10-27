@@ -31,8 +31,8 @@ public class ChoiceApi {
         return resultApi;
     }
 
-    @GetMapping("/{id}")
-    public ResponseObject<?> getChoiceById(@PathVariable Integer id) {
+    @GetMapping("/getById")
+    public ResponseObject<?> getChoiceById(@RequestParam("id") Integer id) {
         var resultApi = new ResponseObject<>();
         try {
             resultApi.setData(choiceService.getChoiceById(id));
@@ -41,7 +41,7 @@ public class ChoiceApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/choice/" + id, e);
+            log.error("Fail When Call API /api/v1/choice/getById?id=" + id, e);
         }
         return resultApi;
     }
@@ -61,24 +61,23 @@ public class ChoiceApi {
         return resultApi;
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseObject<?> updateChoice(
-            @PathVariable Integer id, @RequestBody ChoiceDTO choiceDTO) {
+    @PutMapping("/update")
+    public ResponseObject<?> updateChoice(@RequestBody ChoiceDTO choiceDTO) {
         var resultApi = new ResponseObject<>();
         try {
-            resultApi.setData(choiceService.updateChoice(id, choiceDTO));
+            resultApi.setData(choiceService.updateChoice(choiceDTO));
             resultApi.setSuccess(true);
             resultApi.setMessage("updateChoice success");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/choice/update/" + id, e);
+            log.error("Fail When Call API /api/v1/choice/update ", e);
         }
         return resultApi;
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseObject<?> deleteChoice(@PathVariable Integer id) {
+    @DeleteMapping("/delete")
+    public ResponseObject<?> deleteChoice(@RequestParam("id") Integer id) {
         var resultApi = new ResponseObject<>();
         try {
             choiceService.deleteChoice(id);
@@ -87,7 +86,7 @@ public class ChoiceApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/choice/delete/" + id, e);
+            log.error("Fail When Call API /api/v1/choice/delete?id=" + id, e);
         }
         return resultApi;
     }
