@@ -3,7 +3,6 @@ package com.example.coursemanagement.service;
 import com.example.coursemanagement.data.DTO.EnrollmentDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface EnrollmentService {
     List<EnrollmentDTO> getAllEnrollments();
