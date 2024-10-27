@@ -94,4 +94,20 @@ public class EnrollmentApi {
         }
         return resultApi;
     }
+
+    @GetMapping("/getEnrollmentByUserId")
+    public ResponseObject<?> getEnrollmentsByUserId(@RequestParam("userId") Integer userId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            var enrollments = enrollmentService.getAllEnrollmentsByUserId(userId);
+            resultApi.setData(enrollments);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Fetched enrollments for course successfully");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Failed to get enrollments by User ID: {}", userId, e);
+        }
+        return resultApi;
+    }
 }

@@ -44,17 +44,21 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
+    public Optional<UserDTO> getAllUserByUserId(Integer userId) {
+        Optional<UserEntity> users = userRepository.findUserByUserId(userId);
+        return users.stream().map(this::convertToDto).findFirst();
+    }
+
+    @Override
     public void registerUser(UserDTO userDTO) {
 
         String encodedPassword = passwordEncoder.encode(userDTO.getPasswordHash());
         userDTO.setPasswordHash(encodedPassword);
-
         String otp = generateOtp();
         LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(5);
         otpStorage.put(userDTO.getEmail(), new OtpInfo(otp, expiryTime));
 
         sendOtpEmail(userDTO.getEmail(), otp);
-
         UserEntity userEntity = convertToEntity(userDTO);
         userRepository.save(userEntity);
     }

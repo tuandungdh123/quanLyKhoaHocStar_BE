@@ -70,6 +70,18 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     }
 
     @Override
+    public List<EnrollmentDTO> getAllEnrollmentsByUserId(Integer userId) {
+        List<EnrollmentEntity> enrollments = enrollmentRepository.findByUser_UserId(userId);
+
+        if (enrollments.isEmpty()) {
+            throw new IllegalArgumentException("User chưa đăng ký bất kỳ khóa học nào.");
+        }
+        return enrollments.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public EnrollmentDTO updateEnrollmentStatus(EnrollmentDTO enrollmentDTO) {
         EnrollmentEntity enrollmentEntity = enrollmentRepository.findById(enrollmentDTO.getEnrollmentId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid enrollment ID"));
