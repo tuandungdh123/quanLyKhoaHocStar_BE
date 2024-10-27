@@ -3,6 +3,8 @@ package com.example.coursemanagement.service.Implement;
 import com.example.coursemanagement.data.DTO.ModuleDTO;
 import com.example.coursemanagement.data.entity.CourseEntity;
 import com.example.coursemanagement.data.entity.ModuleEntity;
+import com.example.coursemanagement.exception.AppException;
+import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.repository.ModuleRepository;
 import com.example.coursemanagement.service.ModuleService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,21 @@ public class ModuleServiceImplement implements ModuleService {
     @Override
     public List<ModuleDTO> getAllModule(){
         List<ModuleEntity> modules = moduleRepository.findAll();
+        return modules.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public ModuleDTO getModuleById (Integer moduleId) throws AppException {
+        var moduleEntityOptional = moduleRepository.findByModuleId(moduleId);
+        if (moduleEntityOptional.isEmpty()) {
+            throw new AppException(ErrorCode.MODULE_NOT_FOUND, "Module not found");
+        }
+        return convertToDTO(moduleEntityOptional.get());
+    }
+
+    @Override
+    public List<ModuleDTO> getModulesByCourseId(Integer courseId) {
+        List<ModuleEntity> modules = moduleRepository.findByCourse_CourseId(courseId);
         return modules.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 

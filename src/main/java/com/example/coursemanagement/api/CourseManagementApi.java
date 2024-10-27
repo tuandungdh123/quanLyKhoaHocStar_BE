@@ -37,21 +37,28 @@ public class CourseManagementApi {
         }
         return resultApi;
     }
-    @GetMapping("/getCourseByCourseID")
-    public ResponseEntity<?> doGetCourseByCourseID(){
-        Map<String, Object> result = new HashMap<>();
+    @GetMapping("/getCourseById")
+    public ResponseObject<?> doGetCourseById(@RequestParam Integer courseId) {
+        var resultApi = new ResponseObject<>();
         try {
-            result.put("status", true);
-            result.put("message", "Get Course Success");
-            result.put("data", null);
-        } catch (Exception e){
-            result.put("status", false);
-            result.put("message", "Get Course Fail");
-            result.put("data", null);
-            log.error("Fail When Call API /course-api/getCourseByCourseID ", e);
+            CourseDTO course = courseService.getCourseById(courseId);
+
+            if (course != null) {
+                resultApi.setData(course);
+                resultApi.setSuccess(true);
+                resultApi.setMessage(ApiMessage.BasicMessageApi.SUCCESS.getBasicMessageApi());
+            } else {
+                resultApi.setSuccess(false);
+                resultApi.setMessage("Course not found");
+            }
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(ApiMessage.BasicMessageApi.FAIL.getBasicMessageApi());
+            log.error("Fail When Call API /user-api/getCourseById/{}: ", courseId, e);
         }
-        return ResponseEntity.ok(result);
+        return resultApi;
     }
+
     @PostMapping("/saveCourse")
     public ResponseObject<?> doPostSaveCourse(@Valid @RequestBody CourseDTO courseDTO) {
         var resultApi = new ResponseObject<>();
