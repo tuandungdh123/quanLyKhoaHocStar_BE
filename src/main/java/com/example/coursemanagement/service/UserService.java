@@ -11,4 +11,6 @@ public interface UserService {
     UserDTO loginUser(UserDTO userDTO);
     void updateUser(UserDTO userDTO);
     void changePassword(PasswordChangeDTO passwordChangeDTO);
+    void sendOtpEmail(String toEmail, String otpCode);
+    boolean verifyOtp(String email, String otp);
 }
