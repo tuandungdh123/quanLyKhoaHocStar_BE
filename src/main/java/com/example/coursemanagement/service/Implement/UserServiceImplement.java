@@ -51,7 +51,6 @@ public class UserServiceImplement implements UserService {
 
     @Override
     public void registerUser(UserDTO userDTO) {
-
         String encodedPassword = passwordEncoder.encode(userDTO.getPasswordHash());
         userDTO.setPasswordHash(encodedPassword);
         String otp = generateOtp();
@@ -72,10 +71,10 @@ public class UserServiceImplement implements UserService {
             if (passwordEncoder.matches(userDTO.getPasswordHash(), userEntity.getPasswordHash())) {
                 return convertToDto(userEntity);
             } else {
-                throw new AppException(ErrorCode.INVALID_CREDENTIALS, "Invalid password");
+                throw new AppException(ErrorCode.INVALID_CREDENTIALS, "Mật khẩu không chính xác");
             }
         } else {
-            throw new AppException(ErrorCode.USER_NOT_FOUND, "User not found");
+            throw new AppException(ErrorCode.USER_NOT_FOUND, "Không tìm thấy người dùng");
         }
     }
 
@@ -104,7 +103,7 @@ public class UserServiceImplement implements UserService {
 
             userRepository.save(userEntity);
         } else {
-            throw new AppException(ErrorCode.USER_NOT_FOUND, "User not found");
+            throw new AppException(ErrorCode.USER_NOT_FOUND, "Không tìm thấy người dùng");
         }
     }
 
@@ -116,20 +115,21 @@ public class UserServiceImplement implements UserService {
             UserEntity userEntity = userEntityOptional.get();
 
             if (!passwordEncoder.matches(passwordChangeDTO.getCurrentPassword(), userEntity.getPasswordHash())) {
-                throw new AppException(ErrorCode.INVALID_CREDENTIALS, "Current password is incorrect");
+                throw new AppException(ErrorCode.INVALID_CREDENTIALS, "Mật khẩu hiện tại không chính xác");
             }
 
             if (!passwordChangeDTO.getNewPassword().equals(passwordChangeDTO.getConfirmPassword())) {
-                throw new AppException(ErrorCode.PASSWORDS_DO_NOT_MATCH, "New password and confirm password do not match");
+                throw new AppException(ErrorCode.PASSWORDS_DO_NOT_MATCH, "Mật khẩu mới và mật khẩu xác nhận không khớp");
             }
 
             String encodedNewPassword = passwordEncoder.encode(passwordChangeDTO.getNewPassword());
             userEntity.setPasswordHash(encodedNewPassword);
             userRepository.save(userEntity);
         } else {
-            throw new AppException(ErrorCode.USER_NOT_FOUND, "User not found");
+            throw new AppException(ErrorCode.USER_NOT_FOUND, "Không tìm thấy người dùng");
         }
     }
+
     @Override
     public void sendOtpEmail(String toEmail, String otpCode) {
         try {
@@ -181,14 +181,12 @@ public class UserServiceImplement implements UserService {
         return false;
     }
 
-
     private UserDTO convertToDto(UserEntity userEntity) {
         return UserDTO.builder()
                 .userId(userEntity.getUserId())
                 .name(userEntity.getName())
                 .phone(userEntity.getPhone())
                 .email(userEntity.getEmail())
-//                .passwordHash(userEntity.getPasswordHash())
                 .avatarUrl(userEntity.getAvatarUrl())
                 .registrationDate(userEntity.getRegistrationDate())
                 .status(userEntity.getStatus())
@@ -215,6 +213,4 @@ public class UserServiceImplement implements UserService {
 
         return userEntity;
     }
-
-
 }

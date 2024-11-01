@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,47 +20,37 @@ public class CourseServiceImplement implements CourseService {
     private final CourseRepository courseRepository;
 
     @Override
-    public List<CourseDTO> getAllCourse(){
+    public List<CourseDTO> getAllCourse() {
         List<CourseEntity> courses = courseRepository.findAll();
         return courses.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @Override
     public CourseDTO getCourseById(Integer courseId) throws AppException {
-        var courseEntityOptional = courseRepository.findByCourseId(courseId);
-        if (courseEntityOptional.isEmpty()) {
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course not found");
-        }
-        return convertToDto(courseEntityOptional.get());
+        return courseRepository.findByCourseId(courseId)
+                .map(this::convertToDto)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND, "Không tìm thấy khóa học với ID: " + courseId));
     }
 
     @Override
     public CourseDTO doSaveCourse(CourseDTO courseDTO) throws SQLException, AppException {
         CourseEntity courseEntity = convertToEntity(courseDTO);
-        courseEntity = courseRepository.save(courseEntity);
-        return convertToDto(courseEntity);
+        CourseEntity savedCourse = courseRepository.save(courseEntity);
+        return convertToDto(savedCourse);
     }
 
     @Override
     public void deleteCourseById(Integer courseId) throws SQLException, AppException {
-        var courseEntityOptional = courseRepository.findById(courseId);
-        if (courseEntityOptional.isEmpty()) {
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course not found");
+        if (!courseRepository.existsById(courseId)) {
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Không tìm thấy khóa học với ID: " + courseId);
         }
-
         courseRepository.deleteById(courseId);
     }
 
     @Override
     public CourseDTO updateCourse(CourseDTO courseDTO) throws SQLException, AppException {
-        var courseEntityOptional = courseRepository.findById(courseDTO.getCourseId());
-        if (courseEntityOptional.isEmpty()) {
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course Not Found");
-        }
-
-
-
-        CourseEntity existingCourse = courseEntityOptional.get();
+        CourseEntity existingCourse = courseRepository.findById(courseDTO.getCourseId())
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND, "Không tìm thấy  khóa học vớiID: " + courseDTO.getCourseId()));
 
         existingCourse.setTitle(courseDTO.getTitle());
         existingCourse.setDescription(courseDTO.getDescription());
@@ -73,7 +64,6 @@ public class CourseServiceImplement implements CourseService {
         existingCourse.setInstructor(courseDTO.getInstructor());
 
         CourseEntity updatedCourse = courseRepository.save(existingCourse);
-
         return convertToDto(updatedCourse);
     }
 
@@ -110,6 +100,4 @@ public class CourseServiceImplement implements CourseService {
 
         return courseEntity;
     }
-
-
 }

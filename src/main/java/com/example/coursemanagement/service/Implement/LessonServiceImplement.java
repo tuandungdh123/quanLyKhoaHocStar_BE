@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @RequiredArgsConstructor
 @Service
 public class LessonServiceImplement implements LessonService {
@@ -22,16 +21,58 @@ public class LessonServiceImplement implements LessonService {
     private final ModuleRepository moduleRepository;
 
     @Override
-    public List<LessonDTO> getAllLesson(){
-        List<LessonEntity> courses = lessonRepository.findAll();
-        return courses.stream().map(this::convertToDTO).collect(Collectors.toList());
+    public List<LessonDTO> getAllLesson() {
+        return lessonRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
+    @Override
+    public LessonDTO addLesson(LessonDTO lessonDTO) {
+        LessonEntity lessonEntity = convertToEntity(lessonDTO);
+        LessonEntity savedEntity = lessonRepository.save(lessonEntity);
+        return convertToDTO(savedEntity);
+    }
 
-    public LessonDTO convertToDTO(LessonEntity lessonEntity) {
-        if (lessonEntity == null) {
-            return null;
+    @Override
+    public LessonDTO updateLesson(Integer lessonId, LessonDTO lessonDTO) {
+        LessonEntity existingLesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND, "Bài học không tìm thấy."));
+
+        existingLesson.setTitle(lessonDTO.getTitle());
+        existingLesson.setContent(lessonDTO.getContent());
+        existingLesson.setVideoUrl(lessonDTO.getVideoUrl());
+        existingLesson.setDuration(lessonDTO.getDuration());
+        existingLesson.setStatus(LessonEntity.LessonStatus.valueOf(lessonDTO.getStatus().name()));
+        existingLesson.setOrderNumber(lessonDTO.getOrderNumber());
+
+        LessonEntity updatedEntity = lessonRepository.save(existingLesson);
+        return convertToDTO(updatedEntity);
+    }
+
+    @Override
+    public void deleteLesson(Integer lessonId) {
+        if (!lessonRepository.existsById(lessonId)) {
+            throw new AppException(ErrorCode.LESSON_NOT_FOUND, "Bài học không tìm thấy.");
         }
+        lessonRepository.deleteById(lessonId);
+    }
+
+    @Override
+    public LessonDTO getLessonById(Integer lessonId) {
+        return lessonRepository.findByLessonId(lessonId)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND, "Bài học không tìm thấy."));
+    }
+
+    @Override
+    public List<LessonDTO> getLessonsByModuleId(Integer moduleId) {
+        return lessonRepository.findByModule_ModuleId(moduleId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private LessonDTO convertToDTO(LessonEntity lessonEntity) {
         return LessonDTO.builder()
                 .lessonId(lessonEntity.getLessonId())
                 .module(lessonEntity.getModule().getModuleId())
@@ -45,54 +86,12 @@ public class LessonServiceImplement implements LessonService {
                 .build();
     }
 
-    @Override
-    public LessonDTO addLesson(LessonDTO lessonDTO) {
-        LessonEntity lessonEntity = convertToEntity(lessonDTO);
-        LessonEntity savedEntity = lessonRepository.save(lessonEntity);
-        return convertToDTO(savedEntity);
-    }
+    private LessonEntity convertToEntity(LessonDTO lessonDTO) {
+        ModuleEntity module = moduleRepository.findById(lessonDTO.getModule())
+                .orElseThrow(() -> new AppException(ErrorCode.MODULE_NOT_FOUND, "Module không tồn tại."));
 
-    @Override
-    public LessonDTO updateLesson(Integer lessonId, LessonDTO lessonDTO) {
-        LessonEntity existingLesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
-        existingLesson.setTitle(lessonDTO.getTitle());
-        existingLesson.setContent(lessonDTO.getContent());
-        existingLesson.setVideoUrl(lessonDTO.getVideoUrl());
-        existingLesson.setDuration(lessonDTO.getDuration());
-        existingLesson.setStatus(LessonEntity.LessonStatus.valueOf(lessonDTO.getStatus().name()));
-        existingLesson.setOrderNumber(lessonDTO.getOrderNumber());
-        LessonEntity updatedEntity = lessonRepository.save(existingLesson);
-        return convertToDTO(updatedEntity);
-    }
-
-    @Override
-    public void deleteLesson(Integer lessonId) {
-        lessonRepository.deleteById(lessonId);
-    }
-
-    @Override
-    public LessonDTO getLessonById(Integer lessonId) {
-        var lessonEntityOptional = lessonRepository.findByLessonId(lessonId);
-        if (lessonEntityOptional.isEmpty()) {
-            throw new AppException(ErrorCode.LESSON_NOT_FOUND, "Lesson not found");
-        }
-        return convertToDTO(lessonEntityOptional.get());
-    }
-
-    @Override
-    public List<LessonDTO> getLessonsByModuleId(Integer moduleId) {
-        List<LessonEntity> lessons = lessonRepository.findByModule_ModuleId(moduleId);
-        return lessons.stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    public LessonEntity convertToEntity(LessonDTO lessonDTO) {
         LessonEntity lessonEntity = new LessonEntity();
         lessonEntity.setLessonId(lessonDTO.getLessonId());
-
-        ModuleEntity module = moduleRepository.findById(lessonDTO.getModule())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
-
         lessonEntity.setModule(module);
         lessonEntity.setTitle(lessonDTO.getTitle());
         lessonEntity.setContent(lessonDTO.getContent());
