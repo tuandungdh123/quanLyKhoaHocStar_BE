@@ -2,21 +2,25 @@ package com.example.coursemanagement.service.Implement;
 
 import com.example.coursemanagement.data.DTO.CourseDTO;
 import com.example.coursemanagement.data.entity.CourseEntity;
+import com.example.coursemanagement.data.entity.UserEntity;
 import com.example.coursemanagement.exception.AppException;
 import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.repository.CourseRepository;
+import com.example.coursemanagement.repository.UserRepository;
 import com.example.coursemanagement.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImplement implements CourseService {
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<CourseDTO> getAllCourse(){
@@ -35,18 +39,30 @@ public class CourseServiceImplement implements CourseService {
 
     @Override
     public CourseDTO doSaveCourse(CourseDTO courseDTO) throws SQLException, AppException {
+        if (courseDTO.getInstructor() == null || !userRepository.existsById(courseDTO.getInstructor())) {
+            throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại");
+        }
+
+        UserEntity instructor = userRepository.findById(courseDTO.getInstructor())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại"));
+
+        if (instructor.getRole().getRoleId() != 2) {
+            throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Bạn không phải là giảng viên");
+        }
+
         CourseEntity courseEntity = convertToEntity(courseDTO);
         courseEntity = courseRepository.save(courseEntity);
         return convertToDto(courseEntity);
     }
 
+
     @Override
     public void deleteCourseById(Integer courseId) throws SQLException, AppException {
+
         var courseEntityOptional = courseRepository.findById(courseId);
         if (courseEntityOptional.isEmpty()) {
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course not found");
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Khóa học không tồn tại");
         }
-
         courseRepository.deleteById(courseId);
     }
 
@@ -54,13 +70,21 @@ public class CourseServiceImplement implements CourseService {
     public CourseDTO updateCourse(CourseDTO courseDTO) throws SQLException, AppException {
         var courseEntityOptional = courseRepository.findById(courseDTO.getCourseId());
         if (courseEntityOptional.isEmpty()) {
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Course Not Found");
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Khóa học không tồn tại");
         }
 
+        if (courseDTO.getInstructor() == null || !userRepository.existsById(courseDTO.getInstructor())) {
+            throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại");
+        }
 
+        UserEntity instructor = userRepository.findById(courseDTO.getInstructor())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại"));
+
+        if (instructor.getRole().getRoleId() != 2) {
+            throw new AppException(ErrorCode.INVALID_INSTRUCTOR_ROLE, "Bạn không phải là giảng viên");
+        }
 
         CourseEntity existingCourse = courseEntityOptional.get();
-
         existingCourse.setTitle(courseDTO.getTitle());
         existingCourse.setDescription(courseDTO.getDescription());
         existingCourse.setImgUrl(courseDTO.getImgUrl());
@@ -70,12 +94,13 @@ public class CourseServiceImplement implements CourseService {
         existingCourse.setSchedule(courseDTO.getSchedule());
         existingCourse.setPrice(courseDTO.getPrice());
         existingCourse.setStatus(courseDTO.getStatus());
-        existingCourse.setInstructor(courseDTO.getInstructor());
+
+        existingCourse.setInstructor(instructor);
 
         CourseEntity updatedCourse = courseRepository.save(existingCourse);
-
         return convertToDto(updatedCourse);
     }
+
 
     private CourseDTO convertToDto(CourseEntity courseEntity) {
         return CourseDTO.builder()
@@ -90,11 +115,11 @@ public class CourseServiceImplement implements CourseService {
                 .price(courseEntity.getPrice())
                 .status(courseEntity.getStatus())
                 .createdAt(courseEntity.getCreatedAt())
-                .instructor(courseEntity.getInstructor())
+                .instructor(courseEntity.getInstructor() != null ? courseEntity.getInstructor().getUserId() : null)
                 .build();
     }
 
-    private CourseEntity convertToEntity(CourseDTO courseDTO) {
+    private CourseEntity convertToEntity(CourseDTO courseDTO) throws AppException {
         CourseEntity courseEntity = new CourseEntity();
         courseEntity.setCourseId(courseDTO.getCourseId());
         courseEntity.setTitle(courseDTO.getTitle());
@@ -106,7 +131,12 @@ public class CourseServiceImplement implements CourseService {
         courseEntity.setSchedule(courseDTO.getSchedule());
         courseEntity.setPrice(courseDTO.getPrice());
         courseEntity.setStatus(courseDTO.getStatus());
-        courseEntity.setInstructor(courseDTO.getInstructor());
+
+        if (courseDTO.getInstructor() != null) {
+            UserEntity instructor = new UserEntity();
+            instructor.setUserId(courseDTO.getInstructor());
+            courseEntity.setInstructor(instructor);
+        }
 
         return courseEntity;
     }
