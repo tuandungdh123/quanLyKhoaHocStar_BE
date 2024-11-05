@@ -16,6 +16,8 @@ public enum ErrorCode {
     public static final String CHOICE_NOT_FOUND = "COURSE_NOT_FOUND";
     public static final String QUESTION_NOT_FOUND = "QUESTION_NOT_FOUND";
     public static final String MEET_SCHEDULE_NOT_FOUND = "MEET_SCHEDULE_NOT_FOUND";
+    public static final String INVALID_INSTRUCTOR_ROLE = "INVALID_INSTRUCTOR_ROLE";
+    public static final String INVALID_INSTRUCTOR = "INVALID_INSTRUCTOR";
 
     private int code;
     private String message;
