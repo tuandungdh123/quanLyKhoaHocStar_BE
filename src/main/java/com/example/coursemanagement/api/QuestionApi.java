@@ -1,6 +1,5 @@
 package com.example.coursemanagement.api;
 
-
 import com.example.coursemanagement.data.DTO.QuestionDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.QuestionService;
@@ -31,8 +30,9 @@ public class QuestionApi {
         }
         return resultApi;
     }
-    @GetMapping("/{id}")
-    public ResponseObject<?> getQuestionById(@PathVariable Integer id) {
+
+    @GetMapping("/getQuestionById")
+    public ResponseObject<?> getQuestionById(@RequestParam Integer id) {
         var resultApi = new ResponseObject<>();
         try {
             resultApi.setData(questionService.getQuestionById(id));
@@ -41,7 +41,7 @@ public class QuestionApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/question/" + id, e);
+            log.error("Fail When Call API /api/v1/question/getQuestionById?id=" + id, e);
         }
         return resultApi;
     }
@@ -61,9 +61,8 @@ public class QuestionApi {
         return resultApi;
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseObject<?> updateQuestion(
-            @PathVariable Integer id, @RequestBody QuestionDTO questionDTO) {
+    @PutMapping("/update")
+    public ResponseObject<?> updateQuestion(@RequestParam Integer id, @RequestBody QuestionDTO questionDTO) {
         var resultApi = new ResponseObject<>();
         try {
             resultApi.setData(questionService.updateQuestion(id, questionDTO));
@@ -72,13 +71,13 @@ public class QuestionApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/question/update/" + id, e);
+            log.error("Fail When Call API /api/v1/question/update?id=" + id, e);
         }
         return resultApi;
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseObject<?> deleteQuestion(@PathVariable Integer id) {
+    @DeleteMapping("/delete")
+    public ResponseObject<?> deleteQuestion(@RequestParam Integer id) {
         var resultApi = new ResponseObject<>();
         try {
             questionService.deleteQuestion(id);
@@ -87,7 +86,7 @@ public class QuestionApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/question/delete/" + id, e);
+            log.error("Fail When Call API /api/v1/question/delete?id=" + id, e);
         }
         return resultApi;
     }

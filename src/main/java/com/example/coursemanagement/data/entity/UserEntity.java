@@ -29,8 +29,8 @@ public class UserEntity {
     @Column(nullable = false, length = 255)
     private String passwordHash;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
     private RoleEntity role;
 
     private String avatarUrl;

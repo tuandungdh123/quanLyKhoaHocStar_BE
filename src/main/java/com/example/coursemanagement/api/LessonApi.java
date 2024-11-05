@@ -89,33 +89,33 @@ public class LessonApi {
         return resultApi;
     }
 
-    @PutMapping("/updateLesson/{id}")
-    public ResponseObject<LessonDTO> doUpdateLesson(@PathVariable Integer id, @RequestBody LessonDTO lessonDTO) {
+    @PutMapping("/updateLesson")
+    public ResponseObject<LessonDTO> updateLesson(@RequestParam Integer lessonId, @RequestBody LessonDTO lessonDTO) {
         var resultApi = new ResponseObject<LessonDTO>();
         try {
-            LessonDTO updatedLesson = lessonService.updateLesson(id, lessonDTO);
+            LessonDTO updatedLesson = lessonService.updateLesson(lessonId, lessonDTO);
             resultApi.setData(updatedLesson);
             resultApi.setSuccess(true);
             resultApi.setMessage("Lesson updated successfully");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/lesson/updateLesson/{id} ", e);
+            log.error("Fail When Call API /api/v1/lesson/updateLesson with lessonId={}: ", lessonId, e);
         }
         return resultApi;
     }
 
-    @DeleteMapping("/deleteLesson/{id}")
-    public ResponseObject<Void> doDeleteLesson(@PathVariable Integer id) {
+    @DeleteMapping("/deleteLesson")
+    public ResponseObject<Void> deleteLesson(@RequestParam Integer lessonId) {
         var resultApi = new ResponseObject<Void>();
         try {
-            lessonService.deleteLesson(id);
+            lessonService.deleteLesson(lessonId);
             resultApi.setSuccess(true);
             resultApi.setMessage("Lesson deleted successfully");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/lesson/deleteLesson/{id} ", e);
+            log.error("Fail When Call API /api/v1/lesson/deleteLesson with lessonId={}: ", lessonId, e);
         }
         return resultApi;
     }
