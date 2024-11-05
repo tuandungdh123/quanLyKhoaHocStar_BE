@@ -3,6 +3,8 @@ package com.example.coursemanagement.service.Implement;
 import com.example.coursemanagement.data.DTO.QuizDTO;
 import com.example.coursemanagement.data.entity.ModuleEntity;
 import com.example.coursemanagement.data.entity.QuizEntity;
+import com.example.coursemanagement.exception.AppException;
+import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.repository.ModuleRepository;
 import com.example.coursemanagement.repository.QuizRepository;
 import com.example.coursemanagement.service.QuizService;
@@ -20,9 +22,9 @@ public class QuizServiceImplement implements QuizService {
     private final ModuleRepository moduleRepository;
 
     @Override
-    public List<QuizDTO> getAllQuiz(){
-        List<QuizEntity> courses = quizRepository.findAll();
-        return courses.stream().map(this::convertToDTO).collect(Collectors.toList());
+    public List<QuizDTO> getAllQuiz() {
+        List<QuizEntity> quizzes = quizRepository.findAll();
+        return quizzes.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public QuizDTO convertToDTO(QuizEntity quizEntity) {
@@ -38,7 +40,7 @@ public class QuizServiceImplement implements QuizService {
     @Override
     public QuizDTO getQuizById(Integer quizId) {
         QuizEntity quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new RuntimeException("Quiz with ID " + quizId + " not found."));
+                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND, String.format("Quiz không tìm thấy với ID: %d", quizId)));
         return convertToDTO(quiz);
     }
 
@@ -52,7 +54,7 @@ public class QuizServiceImplement implements QuizService {
     @Override
     public QuizDTO updateQuiz(Integer quizId, QuizDTO quizDTO) {
         QuizEntity existingQuiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new RuntimeException("Quiz with ID " + quizId + " not found."));
+                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND, String.format("Quiz không tìm thấy với ID: %d", quizId)));
 
         existingQuiz.setTitle(quizDTO.getTitle());
         existingQuiz.setDescription(quizDTO.getDescription());
@@ -67,11 +69,10 @@ public class QuizServiceImplement implements QuizService {
     @Override
     public void deleteQuiz(Integer quizId) {
         if (!quizRepository.existsById(quizId)) {
-            throw new RuntimeException("Quiz with ID " + quizId + " not found.");
+            throw new AppException(ErrorCode.QUIZ_NOT_FOUND, String.format("Quiz không tìm thấy với ID: %d", quizId));
         }
         quizRepository.deleteById(quizId);
     }
-
 
     public QuizEntity convertToEntity(QuizDTO quizDTO) {
         QuizEntity quizEntity = new QuizEntity();
@@ -84,7 +85,7 @@ public class QuizServiceImplement implements QuizService {
         if (optionalModule.isPresent()) {
             quizEntity.setModule(optionalModule.get());
         } else {
-            throw new RuntimeException("Module with ID " + quizDTO.getModuleId() + " not found.");
+            throw new AppException(ErrorCode.MODULE_NOT_FOUND, String.format("Module không tìm thấy với ID: %d", quizDTO.getModuleId()));
         }
 
         return quizEntity;

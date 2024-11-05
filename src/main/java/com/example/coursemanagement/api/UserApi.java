@@ -32,6 +32,21 @@ public class UserApi {
         return resultApi;
     }
 
+    @GetMapping("/getUserByUserId")
+    public ResponseObject<?> doGetUserByUserId(@RequestParam("userId") Integer userId){
+        var resultApi = new ResponseObject<>();
+        try {
+            resultApi.setData(userService.getAllUserByUserId(userId));
+            resultApi.setSuccess(true);
+            resultApi.setMessage("getAllUser success");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Fail When Call API user-api/getAllUser ", e);
+        }
+        return resultApi;
+    }
+
     @PostMapping("/register")
     public ResponseObject<?> registerUser(@RequestBody UserDTO userDTO) {
         var resultApi = new ResponseObject<>();

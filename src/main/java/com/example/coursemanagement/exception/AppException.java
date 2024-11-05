@@ -1,14 +1,14 @@
 package com.example.coursemanagement.exception;
 
+import lombok.Getter;
+
+@Getter
 public class AppException extends RuntimeException {
-    private final String errorCode;
+    private final int errorCode;
 
-    public AppException(String errorCode, String message) {
+    public AppException(ErrorCode errorCode, String message) {
         super(message);
-        this.errorCode = errorCode;
+        this.errorCode = errorCode.getCode();
     }
 
-    public String getErrorCode() {
-        return errorCode;
-    }
 }
