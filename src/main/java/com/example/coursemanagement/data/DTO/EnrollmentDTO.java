@@ -4,6 +4,7 @@ package com.example.coursemanagement.data.DTO;
 
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,9 +16,12 @@ public class EnrollmentDTO {
     private Integer userId;
     private String userName;
     private Integer courseId;
+    private String courseName;
+    private String description;
     private String title;
+    private String imgUrl;
     private EnrollmentStatus status;
-    private LocalDateTime enrollmentDate;
+    private LocalDateTime enrollmentDate = Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime();
     private PaymentStatus paymentStatus;
 
     public enum EnrollmentStatus {

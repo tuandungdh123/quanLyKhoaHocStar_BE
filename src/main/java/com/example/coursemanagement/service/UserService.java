@@ -4,9 +4,13 @@ import com.example.coursemanagement.data.DTO.PasswordChangeDTO;
 import com.example.coursemanagement.data.DTO.UserDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     List<UserDTO> getAllUser();
+
+    Optional<UserDTO> getAllUserByUserId(Integer userId);
+
     void registerUser(UserDTO userDTO);
     UserDTO loginUser(UserDTO userDTO);
     void updateUser(UserDTO userDTO);
