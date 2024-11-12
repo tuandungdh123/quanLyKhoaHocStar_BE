@@ -21,7 +21,8 @@ public enum ErrorCode {
     MEET_SCHEDULE_NOT_FOUND(2010, "Không tìm thấy lịch họp nào"),
     ENROLLMENT_NOT_FOUND(2011, "Không tìm thấy đăng ký nào"),
     PAYMENT_NOT_FOUND(2012, "Không tìm thấy thông tin thanh toán nào"),
-    QUIZ_NOT_FOUND(2013, "Không tìm thấy quiz nào");
+    QUIZ_NOT_FOUND(2013, "Không tìm thấy quiz nào"),
+    DUPLICATE_PROGRESS(2013, "Tiến trình học tập đã tồn tại");
 
     private final int code;
     private final String message;
