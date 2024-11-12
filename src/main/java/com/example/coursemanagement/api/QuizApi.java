@@ -1,9 +1,7 @@
 package com.example.coursemanagement.api;
 
-
 import com.example.coursemanagement.data.DTO.QuizDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
-import com.example.coursemanagement.service.CourseService;
 import com.example.coursemanagement.service.QuizService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +29,9 @@ public class QuizApi {
         }
         return resultApi;
     }
-    @GetMapping("/{quizId}")
-    public ResponseObject<?> getQuizById(@PathVariable Integer quizId) {
+
+    @GetMapping("/getQuizById")
+    public ResponseObject<?> getQuizById(@RequestParam Integer quizId) {
         var resultApi = new ResponseObject<>();
         try {
             resultApi.setData(quizService.getQuizById(quizId));
@@ -41,7 +40,7 @@ public class QuizApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/Quiz/{quizId} ", e);
+            log.error("Fail When Call API /api/v1/Quiz/getQuizById ", e);
         }
         return resultApi;
     }
@@ -61,8 +60,8 @@ public class QuizApi {
         return resultApi;
     }
 
-    @PutMapping("/update/{quizId}")
-    public ResponseObject<?> updateQuiz(@PathVariable Integer quizId, @RequestBody QuizDTO quizDTO) {
+    @PutMapping("/update")
+    public ResponseObject<?> updateQuiz(@RequestParam Integer quizId, @RequestBody QuizDTO quizDTO) {
         var resultApi = new ResponseObject<>();
         try {
             resultApi.setData(quizService.updateQuiz(quizId, quizDTO));
@@ -71,13 +70,13 @@ public class QuizApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/Quiz/update/{quizId} ", e);
+            log.error("Fail When Call API /api/v1/Quiz/update ", e);
         }
         return resultApi;
     }
 
-    @DeleteMapping("/delete/{quizId}")
-    public ResponseObject<?> deleteQuiz(@PathVariable Integer quizId) {
+    @DeleteMapping("/delete")
+    public ResponseObject<?> deleteQuiz(@RequestParam Integer quizId) {
         var resultApi = new ResponseObject<>();
         try {
             quizService.deleteQuiz(quizId);
@@ -86,7 +85,7 @@ public class QuizApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/Quiz/delete/{quizId} ", e);
+            log.error("Fail When Call API /api/v1/Quiz/delete ", e);
         }
         return resultApi;
     }

@@ -22,7 +22,10 @@ public enum ErrorCode {
     ENROLLMENT_NOT_FOUND(2011, "Không tìm thấy đăng ký nào"),
     PAYMENT_NOT_FOUND(2012, "Không tìm thấy thông tin thanh toán nào"),
     QUIZ_NOT_FOUND(2013, "Không tìm thấy quiz nào"),
-    DUPLICATE_PROGRESS(2013, "Tiến trình học tập đã tồn tại");
+    DUPLICATE_PROGRESS(2013, "Tiến trình học tập đã tồn tại"),
+    INVALID_INSTRUCTOR(2014,"Giảng viên này không tồn tại" ),
+    INVALID_INSTRUCTOR_ROLE(2015,"Bạn không phải là giảng viên" );
+
 
     private final int code;
     private final String message;
