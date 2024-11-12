@@ -3,9 +3,8 @@ package com.example.coursemanagement.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,13 +24,20 @@ public class UserProgressEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private CourseEntity course;
 
-    @Column(columnDefinition = "json")
-    private String completedLessons;
+    @ManyToOne
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private LessonEntity lesson;
 
-    @Column(name = "last_accessed", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp lastAccessed;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "progress_percentage", nullable = false)
-    private Double progressPercentage = 0.0;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ProgressStatus status = ProgressStatus.not_started;
+
+    public enum ProgressStatus {
+        not_started,
+        in_progress,
+        completed
+    }
 }
-
