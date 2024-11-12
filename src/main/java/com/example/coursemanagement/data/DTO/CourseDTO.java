@@ -25,5 +25,5 @@ public class CourseDTO {
     private Double price;
     private Boolean status;
     private LocalDateTime createdAt;
-    private UserEntity instructor;
+    private Integer instructor;
 }
