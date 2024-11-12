@@ -15,7 +15,7 @@ import java.nio.file.StandardCopyOption;
 
 @Controller
 @RestController
-@RequestMapping("/upload-api")
+@RequestMapping("/api/v1/upload")
 @CrossOrigin(origins = "*")
 public class FileUploadApi {
 

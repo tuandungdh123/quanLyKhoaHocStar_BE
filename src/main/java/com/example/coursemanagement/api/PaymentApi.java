@@ -1,6 +1,5 @@
 package com.example.coursemanagement.api;
 
-
 import com.example.coursemanagement.data.DTO.PaymentDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.PaymentService;
@@ -46,8 +45,8 @@ public class PaymentApi {
         return resultApi;
     }
 
-    @PutMapping("/updatePayment/{id}") // Specify the ID in the URL
-    public ResponseObject<?> doUpdatePayment(@PathVariable Integer id, @RequestBody PaymentDTO paymentDTO) {
+    @PutMapping("/updatePayment")
+    public ResponseObject<?> doUpdatePayment(@RequestParam Integer id, @RequestBody PaymentDTO paymentDTO) {
         var resultApi = new ResponseObject<>();
         try {
             // Call the service to update the payment status
@@ -57,7 +56,7 @@ public class PaymentApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/payment/updatePayment/{} ", id, e);
+            log.error("Fail When Call API /api/v1/payment/updatePayment?id=" + id, e);
         }
         return resultApi;
     }
