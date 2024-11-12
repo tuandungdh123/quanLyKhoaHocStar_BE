@@ -9,7 +9,6 @@ import com.example.coursemanagement.repository.ChoiceRepository;
 import com.example.coursemanagement.repository.QuestionRepository;
 import com.example.coursemanagement.service.ChoiceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ChoiceServiceImplement implements ChoiceService {
-    @Autowired
     private final ChoiceRepository choiceRepository;
-
-    @Autowired
     private final QuestionRepository questionRepository;
 
     @Override
@@ -35,14 +31,14 @@ public class ChoiceServiceImplement implements ChoiceService {
     @Override
     public ChoiceDTO getChoiceById(Integer choiceId) {
         ChoiceEntity entity = choiceRepository.findById(choiceId)
-                .orElseThrow(() -> new AppException(ErrorCode.CHOICE_NOT_FOUND, "Choice not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CHOICE_NOT_FOUND, "Không tìm thấy lựa chọn với ID: " + choiceId + ". Vui lòng kiểm tra lại."));
         return toDTO(entity);
     }
 
     @Override
     public ChoiceDTO createChoice(ChoiceDTO choiceDTO) {
         QuestionEntity question = questionRepository.findById(choiceDTO.getQuestionId())
-                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Question not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Không tìm thấy câu hỏi với ID: " + choiceDTO.getQuestionId() + ". Vui lòng kiểm tra lại."));
 
         ChoiceEntity entity = toEntity(choiceDTO, question);
         ChoiceEntity savedEntity = choiceRepository.save(entity);
@@ -52,10 +48,10 @@ public class ChoiceServiceImplement implements ChoiceService {
     @Override
     public ChoiceDTO updateChoice(ChoiceDTO choiceDTO) {
         ChoiceEntity existingEntity = choiceRepository.findById(choiceDTO.getChoiceId())
-                .orElseThrow(() -> new AppException(ErrorCode.CHOICE_NOT_FOUND, "Choice not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CHOICE_NOT_FOUND, "Không tìm thấy lựa chọn với ID: " + choiceDTO.getChoiceId() + ". Vui lòng kiểm tra lại."));
 
         QuestionEntity question = questionRepository.findById(choiceDTO.getQuestionId())
-                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Question not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Không tìm thấy câu hỏi với ID: " + choiceDTO.getQuestionId() + ". Vui lòng kiểm tra lại."));
 
         existingEntity.setChoiceText(choiceDTO.getChoiceText());
         existingEntity.setIsCorrect(choiceDTO.getIsCorrect());
@@ -68,7 +64,7 @@ public class ChoiceServiceImplement implements ChoiceService {
     @Override
     public void deleteChoice(Integer choiceId) {
         ChoiceEntity entity = choiceRepository.findById(choiceId)
-                .orElseThrow(() -> new AppException(ErrorCode.CHOICE_NOT_FOUND, "Choice not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CHOICE_NOT_FOUND, "Không tìm thấy lựa chọn với ID: " + choiceId + ". Vui lòng kiểm tra lại."));
         choiceRepository.delete(entity);
     }
 

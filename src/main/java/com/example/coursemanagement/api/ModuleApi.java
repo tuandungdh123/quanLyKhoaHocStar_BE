@@ -2,10 +2,8 @@ package com.example.coursemanagement.api;
 
 
 import com.example.coursemanagement.constant.ApiMessage;
-import com.example.coursemanagement.data.DTO.CourseDTO;
 import com.example.coursemanagement.data.DTO.ModuleDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
-import com.example.coursemanagement.service.CourseService;
 import com.example.coursemanagement.service.ModuleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,30 +87,30 @@ public class ModuleApi {
         return resultApi;
     }
 
-    @DeleteMapping("/deleteModule/{moduleId}")
-    public ResponseObject<?> deleteModule(@PathVariable Integer moduleId) {
+    @DeleteMapping("/deleteModule")
+    public ResponseObject<?> deleteModule(@RequestParam Integer moduleId) {
         var resultApi = new ResponseObject<>();
         try {
             boolean deleted = moduleService.deleteModule(moduleId);
             resultApi.setSuccess(deleted);
-            resultApi.setMessage(deleted ? "deleteModule success" : "Module not found");
+            resultApi.setMessage(deleted ? ApiMessage.BasicMessageApi.SUCCESS.getBasicMessageApi() : "Module not found");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/module/deleteModule", e);
+            log.error("Fail When Call API /api/v1/module/deleteModule with moduleId={}: ", moduleId, e);
         }
         return resultApi;
     }
 
-    @PutMapping("/updateModule/{moduleId}")
-    public ResponseObject<?> updateModule(@PathVariable Integer moduleId, @RequestBody ModuleDTO moduleDTO) {
+    @PutMapping("/updateModule")
+    public ResponseObject<?> updateModule(@RequestParam Integer moduleId, @RequestBody ModuleDTO moduleDTO) {
         var resultApi = new ResponseObject<>();
         try {
             ModuleDTO updatedModule = moduleService.updateModule(moduleId, moduleDTO);
             if (updatedModule != null) {
                 resultApi.setData(updatedModule);
                 resultApi.setSuccess(true);
-                resultApi.setMessage("updateModule success");
+                resultApi.setMessage(ApiMessage.BasicMessageApi.SUCCESS.getBasicMessageApi());
             } else {
                 resultApi.setSuccess(false);
                 resultApi.setMessage("Module not found");
@@ -120,7 +118,7 @@ public class ModuleApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/module/updateModule", e);
+            log.error("Fail When Call API /api/v1/module/updateModule with moduleId={}: ", moduleId, e);
         }
         return resultApi;
     }

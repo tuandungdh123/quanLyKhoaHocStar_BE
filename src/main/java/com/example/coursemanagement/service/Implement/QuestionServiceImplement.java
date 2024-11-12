@@ -1,9 +1,10 @@
 package com.example.coursemanagement.service.Implement;
 
-
 import com.example.coursemanagement.data.DTO.QuestionDTO;
 import com.example.coursemanagement.data.entity.QuestionEntity;
 import com.example.coursemanagement.data.entity.QuizEntity;
+import com.example.coursemanagement.exception.AppException;
+import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.repository.QuestionRepository;
 import com.example.coursemanagement.repository.QuizRepository;
 import com.example.coursemanagement.service.QuestionService;
@@ -15,27 +16,27 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class QuestionServiceImplement  implements QuestionService {
+public class QuestionServiceImplement implements QuestionService {
     private final QuestionRepository questionRepository;
     private final QuizRepository quizRepository;
 
     @Override
-    public List<QuestionDTO> getAllQuestion(){
-        List<QuestionEntity> courses = questionRepository.findAll();
-        return courses.stream().map(this::convertToDTO).collect(Collectors.toList());
+    public List<QuestionDTO> getAllQuestion() {
+        List<QuestionEntity> questions = questionRepository.findAll();
+        return questions.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public QuestionDTO getQuestionById(Integer id) {
         QuestionEntity questionEntity = questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question not found with ID: " + id));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, String.format("Câu hỏi không tìm thấy với ID: %d", id)));
         return convertToDTO(questionEntity);
     }
 
     @Override
     public QuestionDTO createQuestion(QuestionDTO questionDTO) {
         QuizEntity quizEntity = quizRepository.findById(questionDTO.getQuizId())
-                .orElseThrow(() -> new RuntimeException("Quiz not found with ID: " + questionDTO.getQuizId()));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, String.format("Quiz không tìm thấy với ID: %d", questionDTO.getQuizId())));
 
         QuestionEntity questionEntity = convertToEntity(questionDTO, quizEntity);
         questionEntity = questionRepository.save(questionEntity);
@@ -45,10 +46,10 @@ public class QuestionServiceImplement  implements QuestionService {
     @Override
     public QuestionDTO updateQuestion(Integer id, QuestionDTO questionDTO) {
         QuestionEntity existingQuestion = questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question not found with ID: " + id));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, String.format("Câu hỏi không tìm thấy với ID: %d", id)));
 
         QuizEntity quizEntity = quizRepository.findById(questionDTO.getQuizId())
-                .orElseThrow(() -> new RuntimeException("Quiz not found with ID: " + questionDTO.getQuizId()));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, String.format("Quiz không tìm thấy với ID: %d", questionDTO.getQuizId())));
 
         existingQuestion.setQuestionText(questionDTO.getQuestionText());
         existingQuestion.setIsRequired(questionDTO.getIsRequired());
@@ -61,7 +62,7 @@ public class QuestionServiceImplement  implements QuestionService {
     @Override
     public void deleteQuestion(Integer id) {
         QuestionEntity questionEntity = questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question not found with ID: " + id));
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, String.format("Câu hỏi không tìm thấy với ID: %d", id)));
         questionRepository.delete(questionEntity);
     }
 
@@ -73,6 +74,7 @@ public class QuestionServiceImplement  implements QuestionService {
                 questionEntity.getIsRequired()
         );
     }
+
     public QuestionEntity convertToEntity(QuestionDTO questionDTO, QuizEntity quizEntity) {
         QuestionEntity questionEntity = new QuestionEntity();
         questionEntity.setQuestionId(questionDTO.getQuestionId());

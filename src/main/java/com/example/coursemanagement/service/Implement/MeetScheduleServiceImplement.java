@@ -3,13 +3,13 @@ package com.example.coursemanagement.service.Implement;
 import com.example.coursemanagement.data.DTO.MeetingScheduleDTO;
 import com.example.coursemanagement.data.entity.CourseEntity;
 import com.example.coursemanagement.data.entity.MeetingScheduleEntity;
+import com.example.coursemanagement.exception.AppException;
+import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.repository.CourseRepository;
 import com.example.coursemanagement.repository.MeetingScheduleRepository;
 import com.example.coursemanagement.service.MeetingScheduleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -18,11 +18,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MeetScheduleServiceImplement implements MeetingScheduleService {
-    @Autowired
-    private MeetingScheduleRepository meetingScheduleRepository;
-
-    @Autowired
-    private CourseRepository courseRepository;
+    private final MeetingScheduleRepository meetingScheduleRepository;
+    private final CourseRepository courseRepository;
 
     @Override
     public List<MeetingScheduleDTO> getAllMeetingSchedules() {
@@ -33,11 +30,9 @@ public class MeetScheduleServiceImplement implements MeetingScheduleService {
 
     @Override
     public MeetingScheduleDTO getMeetingScheduleById(Integer meetingId) {
-        Optional<MeetingScheduleEntity> entity = meetingScheduleRepository.findById(meetingId);
-        if (entity.isEmpty()) {
-            throw new RuntimeException("Meeting Schedule with ID " + meetingId + " not found");
-        }
-        return convertToDTO(entity.get());
+        return meetingScheduleRepository.findById(meetingId)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new AppException(ErrorCode.MEET_SCHEDULE_NOT_FOUND, "Không tìm thấy lịch họp nào."));
     }
 
     @Override
@@ -49,15 +44,12 @@ public class MeetScheduleServiceImplement implements MeetingScheduleService {
 
     @Override
     public MeetingScheduleDTO updateMeetingSchedule(Integer meetingId, MeetingScheduleDTO dto) {
-        Optional<MeetingScheduleEntity> existingEntity = meetingScheduleRepository.findById(meetingId);
-        if (existingEntity.isEmpty()) {
-            throw new RuntimeException("Meeting Schedule with ID " + meetingId + " not found");
-        }
+        MeetingScheduleEntity entityToUpdate = meetingScheduleRepository.findById(meetingId)
+                .orElseThrow(() -> new AppException(ErrorCode.MEET_SCHEDULE_NOT_FOUND, "Không tìm thấy lịch họp nào."));
 
-        MeetingScheduleEntity entityToUpdate = existingEntity.get();
         entityToUpdate.setMeetingDate(dto.getMeetingDate());
         CourseEntity courseEntity = courseRepository.findById(dto.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Course with ID " + dto.getCourseId() + " not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND, "Không tìm thấy khóa học nào."));
         entityToUpdate.setCourse(courseEntity);
 
         MeetingScheduleEntity updatedEntity = meetingScheduleRepository.save(entityToUpdate);
@@ -67,7 +59,7 @@ public class MeetScheduleServiceImplement implements MeetingScheduleService {
     @Override
     public void deleteMeetingSchedule(Integer meetingId) {
         if (!meetingScheduleRepository.existsById(meetingId)) {
-            throw new RuntimeException("Meeting Schedule with ID " + meetingId + " not found");
+            throw new AppException(ErrorCode.MEET_SCHEDULE_NOT_FOUND, "Không tìm thấy lịch họp nào.");
         }
         meetingScheduleRepository.deleteById(meetingId);
     }
@@ -82,11 +74,10 @@ public class MeetScheduleServiceImplement implements MeetingScheduleService {
     }
 
     private MeetingScheduleEntity convertToEntity(MeetingScheduleDTO dto) {
-        MeetingScheduleEntity entity = new MeetingScheduleEntity();
-
         CourseEntity course = courseRepository.findById(dto.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + dto.getCourseId()));
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND, "Không tìm thấy khóa học nào."));
 
+        MeetingScheduleEntity entity = new MeetingScheduleEntity();
         entity.setMeetingId(dto.getMeetingId());
         entity.setCourse(course);
         entity.setMeetingDate(dto.getMeetingDate());

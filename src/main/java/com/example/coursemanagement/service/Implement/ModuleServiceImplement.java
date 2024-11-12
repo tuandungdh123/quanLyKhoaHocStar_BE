@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,31 +21,31 @@ public class ModuleServiceImplement implements ModuleService {
     private final ModuleRepository moduleRepository;
 
     @Override
-    public List<ModuleDTO> getAllModule(){
-        List<ModuleEntity> modules = moduleRepository.findAll();
-        return modules.stream().map(this::convertToDTO).collect(Collectors.toList());
+    public List<ModuleDTO> getAllModule() {
+        return moduleRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public ModuleDTO getModuleById (Integer moduleId) throws AppException {
-        var moduleEntityOptional = moduleRepository.findByModuleId(moduleId);
-        if (moduleEntityOptional.isEmpty()) {
-            throw new AppException(ErrorCode.MODULE_NOT_FOUND, "Module not found");
-        }
-        return convertToDTO(moduleEntityOptional.get());
+    public ModuleDTO getModuleById(Integer moduleId) {
+        return moduleRepository.findByModuleId(moduleId)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new AppException(ErrorCode.MODULE_NOT_FOUND, "Không tìm thấy chương học nào."));
     }
 
     @Override
     public List<ModuleDTO> getModulesByCourseId(Integer courseId) {
-        List<ModuleEntity> modules = moduleRepository.findByCourse_CourseId(courseId);
-        return modules.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return moduleRepository.findByCourse_CourseId(courseId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public ModuleDTO addModule(ModuleDTO moduleDTO) {
         CourseEntity courseEntity = moduleDTO.getCourse();
         ModuleEntity moduleEntity = convertToEntity(moduleDTO, courseEntity);
-        moduleEntity.setCreatedAt(LocalDateTime.now()); // Set creation date
+        moduleEntity.setCreatedAt(LocalDateTime.now());
         ModuleEntity savedModule = moduleRepository.save(moduleEntity);
         return convertToDTO(savedModule);
     }
@@ -54,32 +53,26 @@ public class ModuleServiceImplement implements ModuleService {
     @Override
     @Transactional
     public boolean deleteModule(Integer moduleId) {
-        if (moduleRepository.existsById(moduleId)) {
-            moduleRepository.deleteById(moduleId);
-            return true;
+        if (!moduleRepository.existsById(moduleId)) {
+            throw new AppException(ErrorCode.MODULE_NOT_FOUND, "Không tìm thấy chương học nào.");
         }
-        return false;
+        moduleRepository.deleteById(moduleId);
+        return true;
     }
 
     @Override
     public ModuleDTO updateModule(Integer moduleId, ModuleDTO moduleDTO) {
-        Optional<ModuleEntity> existingModuleOpt = moduleRepository.findById(moduleId);
-        if (existingModuleOpt.isPresent()) {
-            ModuleEntity existingModule = existingModuleOpt.get();
-            existingModule.setTitle(moduleDTO.getTitle());
-            existingModule.setOrderNumber(moduleDTO.getOrderNumber());
-            existingModule.setCourse(moduleDTO.getCourse());
-            ModuleEntity updatedModule = moduleRepository.save(existingModule);
-            return convertToDTO(updatedModule);
-        }
-        return null;
+        ModuleEntity existingModule = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> new AppException(ErrorCode.MODULE_NOT_FOUND, "Không tìm thấy chương học nào."));
+
+        existingModule.setTitle(moduleDTO.getTitle());
+        existingModule.setOrderNumber(moduleDTO.getOrderNumber());
+        existingModule.setCourse(moduleDTO.getCourse());
+        ModuleEntity updatedModule = moduleRepository.save(existingModule);
+        return convertToDTO(updatedModule);
     }
 
-    public ModuleDTO convertToDTO(ModuleEntity moduleEntity) {
-        if (moduleEntity == null) {
-            return null;
-        }
-
+    private ModuleDTO convertToDTO(ModuleEntity moduleEntity) {
         return ModuleDTO.builder()
                 .moduleId(moduleEntity.getModuleId())
                 .course(moduleEntity.getCourse())
@@ -88,18 +81,14 @@ public class ModuleServiceImplement implements ModuleService {
                 .createdAt(moduleEntity.getCreatedAt())
                 .build();
     }
-    public ModuleEntity convertToEntity(ModuleDTO moduleDTO, CourseEntity courseEntity) {
-        if (moduleDTO == null) {
-            return null;
-        }
 
+    private ModuleEntity convertToEntity(ModuleDTO moduleDTO, CourseEntity courseEntity) {
         ModuleEntity moduleEntity = new ModuleEntity();
         moduleEntity.setModuleId(moduleDTO.getModuleId());
         moduleEntity.setCourse(courseEntity);
         moduleEntity.setTitle(moduleDTO.getTitle());
         moduleEntity.setOrderNumber(moduleDTO.getOrderNumber());
         moduleEntity.setCreatedAt(moduleDTO.getCreatedAt() != null ? moduleDTO.getCreatedAt() : LocalDateTime.now());
-
         return moduleEntity;
     }
 }
