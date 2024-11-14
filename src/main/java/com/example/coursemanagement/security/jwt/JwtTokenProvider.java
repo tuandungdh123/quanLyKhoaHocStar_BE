@@ -28,6 +28,25 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long jwtExpirationTime;
 
+//    public String generateJwtToken(Authentication authentication) {
+//        try {
+//            String roles = authentication.getAuthorities().stream()
+//                    .map(GrantedAuthority::getAuthority)
+//                    .collect(Collectors.joining(","));
+//
+//            return Jwts.builder()
+//                    .subject(authentication.getName())
+//                    .claim("roles", roles)
+//                    .issuedAt(new Date())
+//                    .expiration(new Date(System.currentTimeMillis() + jwtExpirationTime))
+//                    .signWith(key())
+//                    .compact();
+//        } catch (Exception e) {
+//            logger.error("Error generating JWT token: {}", e.getMessage());
+//            throw new AuthenticationException("Could not generate token");
+//        }
+//    }
+
     public String generateJwtToken(Authentication authentication) {
         try {
             String roles = authentication.getAuthorities().stream()
