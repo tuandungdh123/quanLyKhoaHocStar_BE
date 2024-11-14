@@ -2,6 +2,7 @@ package com.example.coursemanagement.security.service;
 
 import com.example.coursemanagement.data.entity.UserEntity;
 import com.example.coursemanagement.repository.UserRepository;
+import com.example.coursemanagement.security.service.impl.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class CustomerDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be null or empty");
+            throw new IllegalArgumentException("Email cannot be null or empty");
         }
 
         Optional<UserEntity> user = userRepository.findByEmail(email);
@@ -32,11 +32,20 @@ public class CustomerDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.get().getEmail())
-                .password(user.get().getPasswordHash())
-                .authorities(getAuthorities(user.get().getRole().getRoleName()))
-                .build();
+        UserEntity userEntity = user.get();
+
+        // Trả về UserDetailsImpl thay vì User
+        return new UserDetailsImpl(
+                userEntity.getUserId(),
+                userEntity.getEmail(),
+                userEntity.getPasswordHash(),
+                getAuthorities(userEntity.getRole().getRoleName()),
+                userEntity.getName(),
+                userEntity.getAvatarUrl(),
+                userEntity.getRole().getRoleId(),
+                userEntity.getRegistrationDate(),
+                userEntity.getStatus()
+        );
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(String roleName) {
