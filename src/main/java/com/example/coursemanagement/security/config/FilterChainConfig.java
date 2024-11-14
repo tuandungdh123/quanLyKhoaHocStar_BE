@@ -27,7 +27,7 @@ public class FilterChainConfig {
                 .authorizeHttpRequests(registry ->
                         registry
                                 .requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers("/user-api/**").hasRole("ADMIN")
+//                                .requestMatchers("/user-api/**").hasRole("ADMIN")
 //                                .requestMatchers("/course-api/**").hasAnyRole("USER", "MANAGER")
                                 .anyRequest().permitAll()  // Các API không có yêu cầu bảo mật
                 )
@@ -41,7 +41,7 @@ public class FilterChainConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(AbstractHttpConfigurer::disable);
+//        http.cors(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
