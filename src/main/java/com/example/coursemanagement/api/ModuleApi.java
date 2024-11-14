@@ -2,10 +2,8 @@ package com.example.coursemanagement.api;
 
 
 import com.example.coursemanagement.constant.ApiMessage;
-import com.example.coursemanagement.data.DTO.CourseDTO;
 import com.example.coursemanagement.data.DTO.ModuleDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
-import com.example.coursemanagement.service.CourseService;
 import com.example.coursemanagement.service.ModuleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
