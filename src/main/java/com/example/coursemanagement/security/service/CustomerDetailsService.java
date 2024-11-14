@@ -28,7 +28,7 @@ public class CustomerDetailsService implements UserDetailsService {
         }
 
         Optional<UserEntity> user = userRepository.findByEmail(email);
-        if (user == null) {
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
 
@@ -40,7 +40,7 @@ public class CustomerDetailsService implements UserDetailsService {
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(String roleName) {
-        return Set.of(new SimpleGrantedAuthority(roleName));
+        return Set.of(new SimpleGrantedAuthority("ROLE_" + roleName));
     }
 
 }

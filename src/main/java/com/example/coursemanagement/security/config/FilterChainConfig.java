@@ -23,17 +23,10 @@ public class FilterChainConfig {
         http
                 .authorizeHttpRequests(registry ->
                         registry
-//                                .requestMatchers("/api/v1/auth/**").permitAll()
-//                                .requestMatchers("api/v1/category-product/**").permitAll()
-//                                .requestMatchers("api/v1/products/**").permitAll()
-//                                .requestMatchers("api/v1/warehouses/**").permitAll()
-//                                .requestMatchers("api/v1/product-types/**").permitAll()
-//                                .requestMatchers("api/v1/customer-types/**").permitAll()
-//                                .requestMatchers("api/v1/customers/**").permitAll()
-//                                .requestMatchers("api/v1/warehouse-types/**").permitAll()
-//                                .requestMatchers("api/v1/warehouse-zones/**").permitAll()
-//                                .anyRequest().authenticated()
-                                .anyRequest().permitAll()
+                                .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/user-api/**").hasRole("ADMIN")
+//                                .requestMatchers("/course-api/**").hasAnyRole("USER", "MANAGER")
+                                .anyRequest().permitAll()  // Các API không có yêu cầu bảo mật
                 )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -45,7 +38,6 @@ public class FilterChainConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.csrf(AbstractHttpConfigurer::disable);
-
         http.cors(AbstractHttpConfigurer::disable);
 
         return http.build();
