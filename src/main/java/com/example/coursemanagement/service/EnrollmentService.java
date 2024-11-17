@@ -3,6 +3,7 @@ package com.example.coursemanagement.service;
 import com.example.coursemanagement.data.DTO.EnrollmentDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EnrollmentService {
     List<EnrollmentDTO> getAllEnrollments();
@@ -16,4 +17,8 @@ public interface EnrollmentService {
     EnrollmentDTO addEnrollment(EnrollmentDTO enrollmentDTO);
 
     List<EnrollmentDTO> getAllEnrollmentsByUserId(Integer userId);
+
+    Map<String, Long> getEnrollmentStatisticsByCoursePrice();
+
+    Map<String, Double> getMonthlyRevenueStatistics();
 }
