@@ -213,4 +213,18 @@ public class UserServiceImplement implements UserService {
 
         return userEntity;
     }
+
+    @Override
+    public Map<String, Long> getUserRegistrationStatisticsByMonth() {
+        List<Object[]> results = userRepository.countRegistrationsByMonthForRole3();
+        Map<String, Long> statistics = new HashMap<>();
+
+        for (Object[] result : results) {
+            Integer month = (Integer) result[0];
+            Long count = (Long) result[1];
+            statistics.put("Month " + month, count);
+        }
+
+        return statistics;
+    }
 }

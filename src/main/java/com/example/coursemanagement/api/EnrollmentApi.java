@@ -5,7 +5,10 @@ import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.EnrollmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -109,5 +112,17 @@ public class EnrollmentApi {
             log.error("Failed to get enrollments by User ID: {}", userId, e);
         }
         return resultApi;
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String, Long>> getEnrollmentStatisticsByCoursePrice() {
+        Map<String, Long> statistics = enrollmentService.getEnrollmentStatisticsByCoursePrice();
+        return ResponseEntity.ok(statistics);
+    }
+
+    @GetMapping("/revenue/statistics")
+    public ResponseEntity<Map<String, Double>> getMonthlyRevenueStatistics() {
+        Map<String, Double> statistics = enrollmentService.getMonthlyRevenueStatistics();
+        return ResponseEntity.ok(statistics);
     }
 }
