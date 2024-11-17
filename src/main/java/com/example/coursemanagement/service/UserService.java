@@ -4,6 +4,7 @@ import com.example.coursemanagement.data.DTO.PasswordChangeDTO;
 import com.example.coursemanagement.data.DTO.UserDTO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserService {
@@ -17,4 +18,6 @@ public interface UserService {
     void changePassword(PasswordChangeDTO passwordChangeDTO);
     void sendOtpEmail(String toEmail, String otpCode);
     boolean verifyOtp(String email, String otp);
+
+    Map<String, Long> getUserRegistrationStatisticsByMonth();
 }

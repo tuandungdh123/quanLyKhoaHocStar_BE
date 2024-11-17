@@ -7,7 +7,10 @@ import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -125,5 +128,10 @@ public class UserApi {
             log.error("Fail When Call API user-api/changePassword", e);
         }
         return resultApi;
+    }
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String, Long>> getUserRegistrationStatisticsByMonth() {
+        Map<String, Long> statistics = userService.getUserRegistrationStatisticsByMonth();
+        return ResponseEntity.ok(statistics);
     }
 }

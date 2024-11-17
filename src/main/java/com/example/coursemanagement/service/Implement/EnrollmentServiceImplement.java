@@ -13,7 +13,9 @@ import com.example.coursemanagement.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -132,5 +134,31 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         entity.setEnrollmentDate(enrollmentDTO.getEnrollmentDate());
         return entity;
+    }
+
+    @Override
+    public Map<String, Long> getEnrollmentStatisticsByCoursePrice() {
+        long freeCoursesCount = enrollmentRepository.countFreeCourses();
+        long proCoursesCount = enrollmentRepository.countProCourses();
+
+        Map<String, Long> statistics = new HashMap<>();
+        statistics.put("Free Courses", freeCoursesCount);
+        statistics.put("Pro Courses", proCoursesCount);
+
+        return statistics;
+    }
+
+    @Override
+    public Map<String, Double> getMonthlyRevenueStatistics() {
+        List<Object[]> results = enrollmentRepository.calculateMonthlyRevenue();
+        Map<String, Double> statistics = new HashMap<>();
+
+        for (Object[] result : results) {
+            Integer month = (Integer) result[0];
+            Double totalRevenue = (Double) result[1];
+            statistics.put("Month " + month, totalRevenue);
+        }
+
+        return statistics;
     }
 }
