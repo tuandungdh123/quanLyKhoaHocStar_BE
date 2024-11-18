@@ -9,15 +9,12 @@ import java.util.Optional;
 
 public interface UserService {
     List<UserDTO> getAllUser();
-
     Optional<UserDTO> getAllUserByUserId(Integer userId);
-
     void registerUser(UserDTO userDTO);
     UserDTO loginUser(UserDTO userDTO);
     void updateUser(UserDTO userDTO);
     void changePassword(PasswordChangeDTO passwordChangeDTO);
     void sendOtpEmail(String toEmail, String otpCode);
     boolean verifyOtp(String email, String otp);
-
     Map<String, Long> getUserRegistrationStatisticsByMonth();
 }

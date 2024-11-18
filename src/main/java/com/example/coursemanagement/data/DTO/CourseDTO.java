@@ -1,6 +1,5 @@
 package com.example.coursemanagement.data.DTO;
 
-import com.example.coursemanagement.data.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
