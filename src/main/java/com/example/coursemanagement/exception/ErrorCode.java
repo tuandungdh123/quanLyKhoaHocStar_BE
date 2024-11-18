@@ -21,10 +21,12 @@ public enum ErrorCode {
     MEET_SCHEDULE_NOT_FOUND(2010, "Không tìm thấy lịch họp nào"),
     ENROLLMENT_NOT_FOUND(2011, "Không tìm thấy đăng ký nào"),
     PAYMENT_NOT_FOUND(2012, "Không tìm thấy thông tin thanh toán nào"),
-    QUIZ_NOT_FOUND(2013, "Không tìm thấy quiz nào"),
-    DUPLICATE_PROGRESS(2013, "Tiến trình học tập đã tồn tại"),
-    INVALID_INSTRUCTOR(2014,"Giảng viên này không tồn tại" ),
-    INVALID_INSTRUCTOR_ROLE(2015,"Bạn không phải là giảng viên" );
+    PAYMENT_ALREADY_EXISTS(2013, "Thanh toán cho đăng ký này đã tồn tại"),
+    QUIZ_NOT_FOUND(2014, "Không tìm thấy quiz nào"),
+    DUPLICATE_PROGRESS(2015, "Tiến trình học tập đã tồn tại"),
+    INVALID_INSTRUCTOR(2016,"Giảng viên này không tồn tại" ),
+    INVALID_INSTRUCTOR_ROLE(2017,"Bạn không phải là giảng viên" ),
+    DATABASE_ERROR(2018, "Lỗi database");
 
 
     private final int code;

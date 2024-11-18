@@ -1,10 +1,8 @@
 package com.example.coursemanagement.service;
 
-import com.example.coursemanagement.data.DTO.CourseDTO;
 import com.example.coursemanagement.data.DTO.ModuleDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ModuleService {
     List<ModuleDTO> getAllModule();

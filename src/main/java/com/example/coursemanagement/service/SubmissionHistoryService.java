@@ -6,8 +6,6 @@ import java.util.List;
 
 public interface SubmissionHistoryService {
     List<SubmissionHistoryDTO> getAllSubmissionHistories();
-
     SubmissionHistoryDTO saveSubmissionHistory(SubmissionHistoryDTO submissionHistoryDTO);
-
     SubmissionHistoryDTO getSubmissionHistoryById(Integer submissionHistoryId);
 }
