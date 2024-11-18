@@ -1,17 +1,12 @@
 package com.example.coursemanagement.payment.service.impl;
 
 import com.example.coursemanagement.data.entity.EnrollmentEntity;
-import com.example.coursemanagement.exception.AppException;
-import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.payment.config.VNPayConfig;
-import com.example.coursemanagement.payment.data.PaymentDTO;
 import com.example.coursemanagement.payment.data.PaymentEntity;
 import com.example.coursemanagement.payment.repository.PaymentTransactionRepository;
 import com.example.coursemanagement.payment.service.VNPayService;
 import com.example.coursemanagement.repository.EnrollmentRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,37 +29,6 @@ public class VNPayServiceImpl implements VNPayService {
     @Autowired
     private EnrollmentRepository enrollmentRepository;
 
-//    @Override
-//    public PaymentDTO savePayment(@Valid PaymentDTO paymentDTO) {
-//        // Kiểm tra dữ liệu đầu vào
-//        if (paymentDTO.getEnrollmentId() == null || paymentDTO.getAmount() == null || paymentDTO.getOrderInfo() == null) {
-//            throw new AppException(ErrorCode.INVALID_CREDENTIALS, "EnrollmentId, Amount và OrderInfo là bắt buộc.");
-//        }
-//
-//        // Kiểm tra xem Enrollment có tồn tại không
-//        EnrollmentEntity enrollmentEntity = enrollmentRepository.findById(paymentDTO.getEnrollmentId())
-//                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND, "Đăng ký khóa học không tồn tại."));
-//
-//        // Kiểm tra xem đã có thanh toán nào cho Enrollment này chưa
-//        boolean paymentExists = paymentTransactionRepository.existsByEnrollmentId(paymentDTO.getEnrollmentId());
-//        if (paymentExists) {
-//            throw new AppException(ErrorCode.PAYMENT_ALREADY_EXISTS, "Thanh toán cho đăng ký này đã tồn tại.");
-//        }
-//
-//        // Thiết lập trạng thái mặc định là "PENDING" nếu chưa được truyền
-//        String paymentStatus = paymentDTO.getPaymentStatus() != null ? paymentDTO.getPaymentStatus() : "PENDING";
-//
-//        PaymentEntity paymentEntity = convertToEntity(paymentDTO);
-//
-//        // Lưu thông tin thanh toán vào cơ sở dữ liệu
-//        PaymentEntity savedPayment = paymentTransactionRepository.save(paymentEntity);
-//
-//        // Ghi log kết quả và trả về PaymentDTO
-//        log.info("Payment saved successfully: {}", savedPayment);
-//        return convertToDTO(savedPayment);
-//    }
-
-
     @Override
     public String createOrder(int total, String orderInfo, String urlReturn, Integer enrollmentId) {
         String vnp_Version = "2.1.0";
@@ -78,7 +42,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnp_Params.put("vnp_Version", vnp_Version);
         vnp_Params.put("vnp_Command", vnp_Command);
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
-        vnp_Params.put("vnp_Amount", String.valueOf(total * 100));  // Convert to VND (cent)
+        vnp_Params.put("vnp_Amount", String.valueOf(total * 100));
         vnp_Params.put("vnp_CurrCode", "VND");
 
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
@@ -203,31 +167,5 @@ public class VNPayServiceImpl implements VNPayService {
 
         return "Cập nhật trạng thái thanh toán thành công!";
     }
-
-//    private PaymentDTO convertToDTO(PaymentEntity paymentEntity) {
-//        return PaymentDTO.builder()
-//                .paymentId(paymentEntity.getPaymentId())
-//                .enrollmentId(paymentEntity.getEnrollmentId())
-//                .amount(paymentEntity.getAmount())
-//                .orderInfo(paymentEntity.getOrderInfo())
-//                .transactionId(paymentEntity.getTransactionId())
-//                .createdAt(paymentEntity.getCreatedAt())
-//                .updatedAt(paymentEntity.getUpdatedAt())
-//                .paymentDate(paymentEntity.getPaymentDate())
-//                .paymentStatus(paymentEntity.getPaymentStatus())
-//                .build();
-//    }
-//
-//    private PaymentEntity convertToEntity(PaymentDTO paymentDTO) {
-//        return PaymentEntity.builder()
-//                .enrollmentId(paymentDTO.getEnrollmentId())
-//                .amount(paymentDTO.getAmount())
-//                .orderInfo(paymentDTO.getOrderInfo())
-//                .transactionId(paymentDTO.getTransactionId())
-//                .paymentStatus(paymentDTO.getPaymentStatus())
-//                .paymentDate(LocalDateTime.now())
-//                .build();
-//    }
-
 }
 
