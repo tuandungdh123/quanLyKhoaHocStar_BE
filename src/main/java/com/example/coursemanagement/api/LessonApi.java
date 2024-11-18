@@ -3,7 +3,6 @@ package com.example.coursemanagement.api;
 
 import com.example.coursemanagement.constant.ApiMessage;
 import com.example.coursemanagement.data.DTO.LessonDTO;
-import com.example.coursemanagement.data.DTO.ModuleDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.LessonService;
 import lombok.extern.slf4j.Slf4j;
