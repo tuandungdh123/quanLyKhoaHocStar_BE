@@ -118,14 +118,22 @@ public class EnrollmentApi {
             // Gọi service để kiểm tra đăng ký của người dùng với khóa học
             EnrollmentDTO enrollmentDTO = enrollmentService.checkEnrollment(userId, courseId);
 
-            // Nếu đã đăng ký và trạng thái thanh toán là pending, gửi thông báo để điều hướng đến trang thanh toán
-            if (enrollmentDTO != null && enrollmentDTO.getPaymentStatus() == EnrollmentDTO.PaymentStatus.pending) {
-                resultApi.setSuccess(true);
-                resultApi.setMessage("Enrollment found with pending payment status. Redirecting to payment.");
+            if (enrollmentDTO != null) {
+                if (enrollmentDTO.getPaymentStatus() == EnrollmentDTO.PaymentStatus.pending) {
+                    resultApi.setSuccess(true);
+                    resultApi.setMessage("Enrollment found with pending payment status. Redirecting to payment.");
+                } else if (enrollmentDTO.getPaymentStatus() == EnrollmentDTO.PaymentStatus.failed) {
+                    resultApi.setSuccess(true);
+                    resultApi.setMessage("Payment failed. Redirecting to payment page for retry.");
+                } else {
+                    resultApi.setSuccess(false);
+                    resultApi.setMessage("No pending or failed enrollment. User is not enrolled.");
+                }
             } else {
                 resultApi.setSuccess(false);
-                resultApi.setMessage("No pending enrollment or user is not enrolled.");
+                resultApi.setMessage("No enrollment found for the user.");
             }
+
             resultApi.setData(enrollmentDTO);
         } catch (Exception e) {
             // Xử lý lỗi nếu có

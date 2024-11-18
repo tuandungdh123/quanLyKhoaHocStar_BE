@@ -113,7 +113,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
             EnrollmentEntity enrollmentEntity = enrollmentEntityOpt.get();
 
             // Nếu trạng thái thanh toán là pending, trả về thông tin đăng ký
-            if (enrollmentEntity.getPaymentStatus() == EnrollmentEntity.PaymentStatus.pending) {
+            if (enrollmentEntity.getPaymentStatus() == EnrollmentEntity.PaymentStatus.pending || enrollmentEntity.getPaymentStatus() == EnrollmentEntity.PaymentStatus.failed) {
                 return convertToDTO(enrollmentEntity);
             }
         }

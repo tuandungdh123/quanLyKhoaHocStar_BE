@@ -1,10 +1,19 @@
 package com.example.coursemanagement.payment.service.impl;
 
+import com.example.coursemanagement.data.entity.EnrollmentEntity;
+import com.example.coursemanagement.exception.AppException;
+import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.payment.config.VNPayConfig;
-import com.example.coursemanagement.payment.data.PaymentTransaction;
+import com.example.coursemanagement.payment.data.PaymentDTO;
+import com.example.coursemanagement.payment.data.PaymentEntity;
 import com.example.coursemanagement.payment.repository.PaymentTransactionRepository;
 import com.example.coursemanagement.payment.service.VNPayService;
+import com.example.coursemanagement.repository.EnrollmentRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,16 +21,52 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class VNPayServiceImpl implements VNPayService {
 
     @Autowired
     private PaymentTransactionRepository paymentTransactionRepository;
+    @Autowired
+    private EnrollmentRepository enrollmentRepository;
+
+//    @Override
+//    public PaymentDTO savePayment(@Valid PaymentDTO paymentDTO) {
+//        // Kiểm tra dữ liệu đầu vào
+//        if (paymentDTO.getEnrollmentId() == null || paymentDTO.getAmount() == null || paymentDTO.getOrderInfo() == null) {
+//            throw new AppException(ErrorCode.INVALID_CREDENTIALS, "EnrollmentId, Amount và OrderInfo là bắt buộc.");
+//        }
+//
+//        // Kiểm tra xem Enrollment có tồn tại không
+//        EnrollmentEntity enrollmentEntity = enrollmentRepository.findById(paymentDTO.getEnrollmentId())
+//                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND, "Đăng ký khóa học không tồn tại."));
+//
+//        // Kiểm tra xem đã có thanh toán nào cho Enrollment này chưa
+//        boolean paymentExists = paymentTransactionRepository.existsByEnrollmentId(paymentDTO.getEnrollmentId());
+//        if (paymentExists) {
+//            throw new AppException(ErrorCode.PAYMENT_ALREADY_EXISTS, "Thanh toán cho đăng ký này đã tồn tại.");
+//        }
+//
+//        // Thiết lập trạng thái mặc định là "PENDING" nếu chưa được truyền
+//        String paymentStatus = paymentDTO.getPaymentStatus() != null ? paymentDTO.getPaymentStatus() : "PENDING";
+//
+//        PaymentEntity paymentEntity = convertToEntity(paymentDTO);
+//
+//        // Lưu thông tin thanh toán vào cơ sở dữ liệu
+//        PaymentEntity savedPayment = paymentTransactionRepository.save(paymentEntity);
+//
+//        // Ghi log kết quả và trả về PaymentDTO
+//        log.info("Payment saved successfully: {}", savedPayment);
+//        return convertToDTO(savedPayment);
+//    }
+
 
     @Override
-    public String createOrder(int total, String orderInfor, String urlReturn, Integer enrollmentId) {
+    public String createOrder(int total, String orderInfo, String urlReturn, Integer enrollmentId) {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
@@ -37,7 +82,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnp_Params.put("vnp_CurrCode", "VND");
 
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", orderInfor);
+        vnp_Params.put("vnp_OrderInfo", orderInfo);
         vnp_Params.put("vnp_OrderType", orderType);
 
         String locate = "vn";
@@ -90,18 +135,16 @@ public class VNPayServiceImpl implements VNPayService {
         String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.vnp_HashSecret, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+        System.out.println("URL thanh toán: " + paymentUrl);
 
         // Lưu thông tin giao dịch vào cơ sở dữ liệu
-        PaymentTransaction transaction = new PaymentTransaction();
+        PaymentEntity transaction = new PaymentEntity();
         transaction.setEnrollmentId(enrollmentId);
-        transaction.setOrderInfo(orderInfor);
+        transaction.setOrderInfo(orderInfo);
         transaction.setAmount(total);
         transaction.setTransactionId(vnp_TxnRef);
         transaction.setPaymentStatus("pending");
         paymentTransactionRepository.save(transaction);
-
-        // Log URL thanh toán
-        System.out.println("URL thanh toán: " + paymentUrl);
 
         return paymentUrl;
     }
@@ -122,15 +165,69 @@ public class VNPayServiceImpl implements VNPayService {
         String vnp_SecureHash = request.getParameter("vnp_SecureHash");
         fields.remove("vnp_SecureHash");
         String signValue = VNPayConfig.hashAllFields(fields);
+        String transactionId = request.getParameter("vnp_TxnRef");
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
+                updatePaymentStatus(transactionId, "SUCCESS");
                 return 1; // Thành công
             } else {
+                updatePaymentStatus(transactionId, "FAILED");
                 return 0; // Thất bại
             }
         } else {
+            updatePaymentStatus(transactionId, "FAILED");
             return -1; // Lỗi chữ ký
         }
     }
+
+    public String updatePaymentStatus(String transactionId, String paymentStatus) {
+        // Tìm giao dịch theo transactionId
+        PaymentEntity paymentEntity = paymentTransactionRepository.findByTransactionId(transactionId);
+
+        if (paymentEntity == null) {
+            return "Không tìm thấy giao dịch với mã giao dịch " + transactionId;
+        }
+
+        // Cập nhật paymentStatus và updatedAt
+        paymentEntity.setPaymentStatus(paymentStatus);
+        paymentEntity.setUpdatedAt(LocalDateTime.now());
+        paymentTransactionRepository.save(paymentEntity);
+
+        EnrollmentEntity enrollmentEntity = enrollmentRepository.findByEnrollmentId(paymentEntity.getEnrollmentId());
+        if (enrollmentEntity == null) {
+            return "Không tìm thấy enrollment với enrollmentId " + paymentEntity.getEnrollmentId();
+        }
+        // Cập nhật paymentStatus cho bảng Enrollments
+        enrollmentEntity.setPaymentStatus(EnrollmentEntity.PaymentStatus.valueOf(paymentStatus));
+        enrollmentRepository.save(enrollmentEntity);
+
+        return "Cập nhật trạng thái thanh toán thành công!";
+    }
+
+//    private PaymentDTO convertToDTO(PaymentEntity paymentEntity) {
+//        return PaymentDTO.builder()
+//                .paymentId(paymentEntity.getPaymentId())
+//                .enrollmentId(paymentEntity.getEnrollmentId())
+//                .amount(paymentEntity.getAmount())
+//                .orderInfo(paymentEntity.getOrderInfo())
+//                .transactionId(paymentEntity.getTransactionId())
+//                .createdAt(paymentEntity.getCreatedAt())
+//                .updatedAt(paymentEntity.getUpdatedAt())
+//                .paymentDate(paymentEntity.getPaymentDate())
+//                .paymentStatus(paymentEntity.getPaymentStatus())
+//                .build();
+//    }
+//
+//    private PaymentEntity convertToEntity(PaymentDTO paymentDTO) {
+//        return PaymentEntity.builder()
+//                .enrollmentId(paymentDTO.getEnrollmentId())
+//                .amount(paymentDTO.getAmount())
+//                .orderInfo(paymentDTO.getOrderInfo())
+//                .transactionId(paymentDTO.getTransactionId())
+//                .paymentStatus(paymentDTO.getPaymentStatus())
+//                .paymentDate(LocalDateTime.now())
+//                .build();
+//    }
+
 }
 
