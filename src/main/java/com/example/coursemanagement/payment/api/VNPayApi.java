@@ -1,8 +1,12 @@
 package com.example.coursemanagement.payment.api;
 
+import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.payment.data.OrderRequest;
+import com.example.coursemanagement.payment.data.PaymentDTO;
+import com.example.coursemanagement.payment.data.PaymentStatusRequest;
 import com.example.coursemanagement.payment.service.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Enumeration;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/vnpay")
 @CrossOrigin(origins = "*")
@@ -17,6 +22,22 @@ public class VNPayApi {
 
     @Autowired
     private VNPayService vnPayService;
+
+//    @PostMapping("/savePayment")
+//    public ResponseObject<?> addPayment(@RequestBody PaymentDTO paymentDTO) {
+//        var resultApi = new ResponseObject<>();
+//        try {
+//            PaymentDTO newPayment = vnPayService.savePayment(paymentDTO);
+//            resultApi.setData(newPayment);
+//            resultApi.setSuccess(true);
+//            resultApi.setMessage("Payment added successfully");
+//        } catch (Exception e) {
+//            resultApi.setSuccess(false);
+//            resultApi.setMessage(e.getMessage());
+//            log.error("Failed to add payment", e);
+//        }
+//        return resultApi;
+//    }
 
     @PostMapping("/submitOrder")
     public ResponseEntity<String> createOrder(@RequestBody OrderRequest orderRequest) {
@@ -48,5 +69,11 @@ public class VNPayApi {
             case -1 -> "Invalid payment signature";
             default -> "Unknown error";
         };
+    }
+
+    @PostMapping("/update-status")
+    public String updatePaymentStatus(@RequestBody PaymentStatusRequest paymentStatusRequest) {
+        // Gọi service để cập nhật trạng thái thanh toán
+        return vnPayService.updatePaymentStatus(paymentStatusRequest.getTransactionId(), paymentStatusRequest.getPaymentStatus());
     }
 }

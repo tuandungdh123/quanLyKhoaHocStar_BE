@@ -1,26 +1,24 @@
 package com.example.coursemanagement.payment.data;
 
-import com.example.coursemanagement.data.entity.EnrollmentEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-@ToString(exclude = "enrollment")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "Payments")
-public class PaymentTransaction {
+public class PaymentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    private Long paymentId;
+    private Integer paymentId;
 
     @Column(name = "enrollment_id", nullable = false)
     private Integer enrollmentId;
@@ -35,14 +33,14 @@ public class PaymentTransaction {
     private String transactionId;
 
     @Column(name = "payment_date", nullable = false)
-    private LocalDateTime paymentDate;
+    private LocalDateTime paymentDate = LocalDateTime.now();
 
     @Column(name = "payment_status", nullable = false, length = 50)
     private String paymentStatus;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
