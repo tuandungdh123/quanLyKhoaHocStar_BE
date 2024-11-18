@@ -8,9 +8,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Cho phép CORS cho tất cả các endpoint
-                .allowedOrigins("http://localhost:3000") // Cho phép từ domain này
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // Các phương thức HTTP được phép
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*");
     }
 }

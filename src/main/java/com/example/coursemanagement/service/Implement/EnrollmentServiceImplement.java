@@ -1,6 +1,7 @@
 package com.example.coursemanagement.service.Implement;
 
 import com.example.coursemanagement.data.DTO.EnrollmentDTO;
+import com.example.coursemanagement.data.Enums.PaymentStatus;
 import com.example.coursemanagement.data.entity.CourseEntity;
 import com.example.coursemanagement.data.entity.EnrollmentEntity;
 import com.example.coursemanagement.data.entity.UserEntity;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,17 +56,24 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         EnrollmentEntity enrollmentEntity = convertToEntity(enrollmentDTO);
 
+        // Kiểm tra số tiền của khóa học
+        CourseEntity course = courseRepository.findById(enrollmentDTO.getCourseId())
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND, "ID khóa học không hợp lệ."));
+
+        // Nếu khóa học có giá trị > 0 thì trạng thái thanh toán là pending, ngược lại là completed
+        PaymentStatus paymentStatus = course.getPrice() > 0 ? PaymentStatus.pending : PaymentStatus.completed;
+        enrollmentEntity.setPaymentStatus(enrollmentDTO.getPaymentStatus() != null
+                ? EnrollmentEntity.PaymentStatus.valueOf(enrollmentDTO.getPaymentStatus().name())
+                : EnrollmentEntity.PaymentStatus.valueOf(paymentStatus.name())); // Sử dụng trạng thái tính toán từ giá trị khóa học
+
         enrollmentEntity.setStatus(enrollmentDTO.getStatus() != null
                 ? EnrollmentEntity.EnrollmentStatus.valueOf(enrollmentDTO.getStatus().name())
                 : EnrollmentEntity.EnrollmentStatus.in_progress);
 
-        enrollmentEntity.setPaymentStatus(enrollmentDTO.getPaymentStatus() != null
-                ? EnrollmentEntity.PaymentStatus.valueOf(enrollmentDTO.getPaymentStatus().name())
-                : EnrollmentEntity.PaymentStatus.pending);
-
         EnrollmentEntity savedEntity = enrollmentRepository.save(enrollmentEntity);
         return convertToDTO(savedEntity);
     }
+
 
     @Override
     public List<EnrollmentDTO> getAllEnrollmentsByUserId(Integer userId) {
@@ -92,6 +101,25 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         EnrollmentEntity enrollmentEntity = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND, "Enrollment ID không tìm thấy."));
         return convertToDTO(enrollmentEntity);
+    }
+
+    @Override
+    public EnrollmentDTO checkEnrollment(Integer userId, Integer courseId) {
+        // Lấy thông tin đăng ký của người dùng và khóa học từ database
+        Optional<EnrollmentEntity> enrollmentEntityOpt = enrollmentRepository.findByUser_UserIdAndCourse_CourseId(userId, courseId);
+
+        // Nếu có thông tin đăng ký
+        if (enrollmentEntityOpt.isPresent()) {
+            EnrollmentEntity enrollmentEntity = enrollmentEntityOpt.get();
+
+            // Nếu trạng thái thanh toán là pending, trả về thông tin đăng ký
+            if (enrollmentEntity.getPaymentStatus() == EnrollmentEntity.PaymentStatus.pending || enrollmentEntity.getPaymentStatus() == EnrollmentEntity.PaymentStatus.failed) {
+                return convertToDTO(enrollmentEntity);
+            }
+        }
+
+        // Nếu không tìm thấy đăng ký hoặc thanh toán không phải pending, trả về null
+        return null;
     }
 
     private EnrollmentDTO convertToDTO(EnrollmentEntity enrollmentEntity) {
