@@ -110,4 +110,30 @@ public class EnrollmentApi {
         }
         return resultApi;
     }
+
+    @GetMapping("/checkEnrollment")
+    public ResponseObject<?> checkEnrollment(@RequestParam("userId") Integer userId, @RequestParam("courseId") Integer courseId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            // Gọi service để kiểm tra đăng ký của người dùng với khóa học
+            EnrollmentDTO enrollmentDTO = enrollmentService.checkEnrollment(userId, courseId);
+
+            // Nếu đã đăng ký và trạng thái thanh toán là pending, gửi thông báo để điều hướng đến trang thanh toán
+            if (enrollmentDTO != null && enrollmentDTO.getPaymentStatus() == EnrollmentDTO.PaymentStatus.pending) {
+                resultApi.setSuccess(true);
+                resultApi.setMessage("Enrollment found with pending payment status. Redirecting to payment.");
+            } else {
+                resultApi.setSuccess(false);
+                resultApi.setMessage("No pending enrollment or user is not enrolled.");
+            }
+            resultApi.setData(enrollmentDTO);
+        } catch (Exception e) {
+            // Xử lý lỗi nếu có
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Failed to check enrollment for userId: {} and courseId: {}", userId, courseId, e);
+        }
+        return resultApi;
+    }
+
 }
