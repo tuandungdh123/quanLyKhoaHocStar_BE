@@ -36,9 +36,6 @@ public class CourseServiceImplement implements CourseService {
 
     @Override
     public CourseDTO doSaveCourse(CourseDTO courseDTO) throws SQLException, AppException {
-        if (courseDTO.getInstructor() == null || !userRepository.existsById(courseDTO.getInstructor())) {
-            throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại");
-        }
 
         UserEntity instructor = userRepository.findById(courseDTO.getInstructor())
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại"));
@@ -65,10 +62,6 @@ public class CourseServiceImplement implements CourseService {
         var courseEntityOptional = courseRepository.findById(courseDTO.getCourseId());
         if (courseEntityOptional.isEmpty()) {
             throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Không tìm thấy  khóa học vớiID: " + courseDTO.getCourseId());
-        }
-
-        if (courseDTO.getInstructor() == null || !userRepository.existsById(courseDTO.getInstructor())) {
-            throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại");
         }
 
         UserEntity instructor = userRepository.findById(courseDTO.getInstructor())

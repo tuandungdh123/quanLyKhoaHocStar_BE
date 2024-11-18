@@ -28,19 +28,17 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtTokenProvider.generateJwtToken(authentication);
 
-        // Lấy thông tin từ UserDetails
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        // Trả về các thông tin người dùng cùng với token
         return AuthenticationResponse.builder()
                 .token(token)
-                .userId(userDetails.getUserId())  // userId đã được cung cấp trong UserDetailsImpl
-                .name(userDetails.getName())      // tên người dùng
-                .email(userDetails.getUsername()) // email người dùng
-                .avatarUrl(userDetails.getAvatarUrl()) // avatarUrl
-                .roleId(userDetails.getRoleId()) // roleId
-                .registrationDate(userDetails.getRegistrationDate()) // registrationDate
-                .status(userDetails.getStatus()) // status
+                .userId(userDetails.getUserId())
+                .name(userDetails.getName())
+                .email(userDetails.getUsername())
+                .avatarUrl(userDetails.getAvatarUrl())
+                .roleId(userDetails.getRoleId())
+                .registrationDate(userDetails.getRegistrationDate())
+                .status(userDetails.getStatus())
                 .build();
     }
 

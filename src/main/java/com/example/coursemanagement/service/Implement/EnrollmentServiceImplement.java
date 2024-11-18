@@ -14,7 +14,9 @@ import com.example.coursemanagement.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -56,15 +58,13 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         EnrollmentEntity enrollmentEntity = convertToEntity(enrollmentDTO);
 
-        // Kiểm tra số tiền của khóa học
         CourseEntity course = courseRepository.findById(enrollmentDTO.getCourseId())
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND, "ID khóa học không hợp lệ."));
 
-        // Nếu khóa học có giá trị > 0 thì trạng thái thanh toán là pending, ngược lại là completed
         PaymentStatus paymentStatus = course.getPrice() > 0 ? PaymentStatus.pending : PaymentStatus.completed;
         enrollmentEntity.setPaymentStatus(enrollmentDTO.getPaymentStatus() != null
                 ? EnrollmentEntity.PaymentStatus.valueOf(enrollmentDTO.getPaymentStatus().name())
-                : EnrollmentEntity.PaymentStatus.valueOf(paymentStatus.name())); // Sử dụng trạng thái tính toán từ giá trị khóa học
+                : EnrollmentEntity.PaymentStatus.valueOf(paymentStatus.name()));
 
         enrollmentEntity.setStatus(enrollmentDTO.getStatus() != null
                 ? EnrollmentEntity.EnrollmentStatus.valueOf(enrollmentDTO.getStatus().name())
@@ -105,20 +105,16 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
     @Override
     public EnrollmentDTO checkEnrollment(Integer userId, Integer courseId) {
-        // Lấy thông tin đăng ký của người dùng và khóa học từ database
         Optional<EnrollmentEntity> enrollmentEntityOpt = enrollmentRepository.findByUser_UserIdAndCourse_CourseId(userId, courseId);
 
-        // Nếu có thông tin đăng ký
         if (enrollmentEntityOpt.isPresent()) {
             EnrollmentEntity enrollmentEntity = enrollmentEntityOpt.get();
 
-            // Nếu trạng thái thanh toán là pending, trả về thông tin đăng ký
             if (enrollmentEntity.getPaymentStatus() == EnrollmentEntity.PaymentStatus.pending || enrollmentEntity.getPaymentStatus() == EnrollmentEntity.PaymentStatus.failed) {
                 return convertToDTO(enrollmentEntity);
             }
         }
 
-        // Nếu không tìm thấy đăng ký hoặc thanh toán không phải pending, trả về null
         return null;
     }
 
@@ -160,5 +156,31 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         entity.setEnrollmentDate(enrollmentDTO.getEnrollmentDate());
         return entity;
+    }
+
+    @Override
+    public Map<String, Long> getEnrollmentStatisticsByCoursePrice() {
+        long freeCoursesCount = enrollmentRepository.countFreeCourses();
+        long proCoursesCount = enrollmentRepository.countProCourses();
+
+        Map<String, Long> statistics = new HashMap<>();
+        statistics.put("Free Courses", freeCoursesCount);
+        statistics.put("Pro Courses", proCoursesCount);
+
+        return statistics;
+    }
+
+    @Override
+    public Map<String, Double> getMonthlyRevenueStatistics() {
+        List<Object[]> results = enrollmentRepository.calculateMonthlyRevenue();
+        Map<String, Double> statistics = new HashMap<>();
+
+        for (Object[] result : results) {
+            Integer month = (Integer) result[0];
+            Double totalRevenue = (Double) result[1];
+            statistics.put("Month " + month, totalRevenue);
+        }
+
+        return statistics;
     }
 }

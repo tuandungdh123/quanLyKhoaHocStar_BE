@@ -56,18 +56,15 @@ public class VNPayServiceImpl implements VNPayService {
         vnp_Params.put("vnp_ReturnUrl", urlReturn);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
-        // Tạo ngày giờ tạo đơn hàng
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
-        // Thêm thời gian hết hạn đơn hàng (15 phút)
         cld.add(Calendar.MINUTE, 15);
         String vnp_ExpireDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
-        // Tạo query string và hash data
         List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
@@ -77,11 +74,9 @@ public class VNPayServiceImpl implements VNPayService {
             String fieldName = itr.next();
             String fieldValue = vnp_Params.get(fieldName);
             if (fieldValue != null && fieldValue.length() > 0) {
-                // Build hash data
                 hashData.append(fieldName).append('=');
                 try {
                     hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                    // Build query
                     query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()))
                             .append('=')
                             .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
@@ -101,7 +96,6 @@ public class VNPayServiceImpl implements VNPayService {
         String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
         System.out.println("URL thanh toán: " + paymentUrl);
 
-        // Lưu thông tin giao dịch vào cơ sở dữ liệu
         PaymentEntity transaction = new PaymentEntity();
         transaction.setEnrollmentId(enrollmentId);
         transaction.setOrderInfo(orderInfo);
@@ -133,14 +127,14 @@ public class VNPayServiceImpl implements VNPayService {
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 updatePaymentStatus(transactionId, "SUCCESS");
-                return 1; // Thành công
+                return 1;
             } else {
                 updatePaymentStatus(transactionId, "FAILED");
-                return 0; // Thất bại
+                return 0;
             }
         } else {
             updatePaymentStatus(transactionId, "FAILED");
-            return -1; // Lỗi chữ ký
+            return -1;
         }
     }
 
@@ -152,7 +146,6 @@ public class VNPayServiceImpl implements VNPayService {
             return "Không tìm thấy giao dịch với mã giao dịch " + transactionId;
         }
 
-        // Cập nhật paymentStatus và updatedAt
         paymentEntity.setPaymentStatus(paymentStatus);
         paymentEntity.setUpdatedAt(LocalDateTime.now());
         paymentTransactionRepository.save(paymentEntity);
@@ -161,7 +154,6 @@ public class VNPayServiceImpl implements VNPayService {
         if (enrollmentEntity == null) {
             return "Không tìm thấy enrollment với enrollmentId " + paymentEntity.getEnrollmentId();
         }
-        // Cập nhật paymentStatus cho bảng Enrollments
         enrollmentEntity.setPaymentStatus(EnrollmentEntity.PaymentStatus.valueOf(paymentStatus));
         enrollmentRepository.save(enrollmentEntity);
 

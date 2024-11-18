@@ -8,10 +8,7 @@ import java.util.List;
 public interface QuestionService {
     List<QuestionDTO> getAllQuestion();
     QuestionDTO getQuestionById(Integer id);
-
     QuestionDTO createQuestion(QuestionDTO questionDTO);
-
     QuestionDTO updateQuestion(Integer id, QuestionDTO questionDTO);
-
     void deleteQuestion(Integer id);
 }

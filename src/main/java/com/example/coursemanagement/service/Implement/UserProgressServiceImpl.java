@@ -40,7 +40,6 @@ public class UserProgressServiceImpl implements UserProgressService {
             throw new AppException(ErrorCode.INVALID_CREDENTIALS, "UserId, CourseId và LessonId là bắt buộc.");
         }
 
-        // Kiểm tra trùng lặp
         Optional<UserProgressEntity> existingProgress = userProgressRepository.findByUser_UserIdAndCourse_CourseIdAndLesson_LessonId(
                 userProgressDTO.getUserId(),
                 userProgressDTO.getCourseId(),
