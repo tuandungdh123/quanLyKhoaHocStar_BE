@@ -8,12 +8,8 @@ import java.util.List;
 
 public interface CourseService {
     List<CourseDTO> getAllCourse();
-
     CourseDTO updateCourse(CourseDTO courseDTO) throws SQLException, AppException;
-
     CourseDTO doSaveCourse(CourseDTO courseDTO) throws SQLException, AppException;
-
     void deleteCourseById(Integer courseId) throws SQLException, AppException;
-
     CourseDTO getCourseById(Integer courseId);
 }

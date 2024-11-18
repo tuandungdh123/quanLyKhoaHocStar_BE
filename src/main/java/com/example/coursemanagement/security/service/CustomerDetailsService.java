@@ -34,7 +34,6 @@ public class CustomerDetailsService implements UserDetailsService {
 
         UserEntity userEntity = user.get();
 
-        // Trả về UserDetailsImpl thay vì User
         return new UserDetailsImpl(
                 userEntity.getUserId(),
                 userEntity.getEmail(),

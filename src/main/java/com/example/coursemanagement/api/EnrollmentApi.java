@@ -5,7 +5,10 @@ import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.EnrollmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -111,11 +114,22 @@ public class EnrollmentApi {
         return resultApi;
     }
 
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String, Long>> getEnrollmentStatisticsByCoursePrice() {
+        Map<String, Long> statistics = enrollmentService.getEnrollmentStatisticsByCoursePrice();
+        return ResponseEntity.ok(statistics);
+    }
+
+    @GetMapping("/revenue/statistics")
+    public ResponseEntity<Map<String, Double>> getMonthlyRevenueStatistics() {
+        Map<String, Double> statistics = enrollmentService.getMonthlyRevenueStatistics();
+        return ResponseEntity.ok(statistics);
+    }
+
     @GetMapping("/checkEnrollment")
     public ResponseObject<?> checkEnrollment(@RequestParam("userId") Integer userId, @RequestParam("courseId") Integer courseId) {
         var resultApi = new ResponseObject<>();
         try {
-            // Gọi service để kiểm tra đăng ký của người dùng với khóa học
             EnrollmentDTO enrollmentDTO = enrollmentService.checkEnrollment(userId, courseId);
 
             if (enrollmentDTO != null) {
@@ -136,7 +150,6 @@ public class EnrollmentApi {
 
             resultApi.setData(enrollmentDTO);
         } catch (Exception e) {
-            // Xử lý lỗi nếu có
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
             log.error("Failed to check enrollment for userId: {} and courseId: {}", userId, courseId, e);
