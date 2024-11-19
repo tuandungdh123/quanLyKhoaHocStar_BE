@@ -22,7 +22,7 @@ public class FileUploadApi {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-            String uploadDir = System.getProperty("user.dir") + "/src/assets/images/Background/background-course";
+            String uploadDir = "D:/React/DATN/quanLyKhoaHocStar/src/assets/images/Background/background-course";
             Path upload = Paths.get(uploadDir);
             if (!Files.exists(upload)) {
                 Files.createDirectories(upload);
