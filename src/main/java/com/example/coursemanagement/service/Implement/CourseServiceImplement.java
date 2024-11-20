@@ -36,18 +36,44 @@ public class CourseServiceImplement implements CourseService {
 
     @Override
     public CourseDTO doSaveCourse(CourseDTO courseDTO) throws SQLException, AppException {
+        UserEntity instructor = null;
+        if (courseDTO.getInstructor() != null) {
+            instructor = userRepository.findById(courseDTO.getInstructor())
+                    .orElseThrow(() -> new AppException(ErrorCode.INVALID_INSTRUCTOR,
+                            "Giảng viên này không tồn tại"));
 
-        UserEntity instructor = userRepository.findById(courseDTO.getInstructor())
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại"));
-
-        if (instructor.getRole().getRoleId() != 2) {
-            throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Bạn không phải là giảng viên");
+            if (instructor.getRole().getRoleId() != 2) {
+                throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Người dùng không phải là giảng viên hợp lệ");
+            }
         }
 
-        CourseEntity courseEntity = convertToEntity(courseDTO);
+        CourseEntity courseEntity;
+
+        if (courseDTO.getCourseId() != null) {
+            courseEntity = courseRepository.findById(courseDTO.getCourseId())
+                    .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND,
+                            "Không tìm thấy khóa học với ID: " + courseDTO.getCourseId()));
+        } else {
+            courseEntity = new CourseEntity();
+        }
+
+        courseEntity.setTitle(courseDTO.getTitle());
+        courseEntity.setDescription(courseDTO.getDescription());
+        courseEntity.setImgUrl(courseDTO.getImgUrl());
+        courseEntity.setStartDate(courseDTO.getStartDate());
+        courseEntity.setEndDate(courseDTO.getEndDate());
+        courseEntity.setMeetingTime(courseDTO.getMeetingTime());
+        courseEntity.setSchedule(courseDTO.getSchedule());
+        courseEntity.setPrice(courseDTO.getPrice());
+        courseEntity.setStatus(courseDTO.getStatus());
+        courseEntity.setInstructor(instructor);
+
         CourseEntity savedCourse = courseRepository.save(courseEntity);
+
         return convertToDto(savedCourse);
     }
+
+
 
     @Override
     public void deleteCourseById(Integer courseId) throws SQLException, AppException {
@@ -56,22 +82,29 @@ public class CourseServiceImplement implements CourseService {
         }
         courseRepository.deleteById(courseId);
     }
-
     @Override
     public CourseDTO updateCourse(CourseDTO courseDTO) throws SQLException, AppException {
-        var courseEntityOptional = courseRepository.findById(courseDTO.getCourseId());
-        if (courseEntityOptional.isEmpty()) {
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Không tìm thấy  khóa học vớiID: " + courseDTO.getCourseId());
+        // Kiểm tra xem courseId có tồn tại không
+        CourseEntity existingCourse = courseRepository.findById(courseDTO.getCourseId())
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND,
+                        "Không tìm thấy khóa học với ID: " + courseDTO.getCourseId()));
+
+        // Nếu instructor không null, kiểm tra giảng viên hợp lệ
+        if (courseDTO.getInstructor() != null) {
+            UserEntity instructor = userRepository.findById(courseDTO.getInstructor())
+                    .orElseThrow(() -> new AppException(ErrorCode.INVALID_INSTRUCTOR,
+                            "Giảng viên này không tồn tại"));
+
+            // Kiểm tra role của giảng viên
+            if (instructor.getRole().getRoleId() != 2) {
+                throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Người dùng không phải là giảng viên hợp lệ");
+            }
+
+            // Cập nhật instructor
+            existingCourse.setInstructor(instructor);
         }
 
-        UserEntity instructor = userRepository.findById(courseDTO.getInstructor())
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_INSTRUCTOR, "Giảng viên này không tồn tại"));
-
-        if (instructor.getRole().getRoleId() != 2) {
-            throw new AppException(ErrorCode.INVALID_INSTRUCTOR_ROLE, "Bạn không phải là giảng viên");
-        }
-
-        CourseEntity existingCourse = courseEntityOptional.get();
+        // Cập nhật các trường khác
         existingCourse.setTitle(courseDTO.getTitle());
         existingCourse.setDescription(courseDTO.getDescription());
         existingCourse.setImgUrl(courseDTO.getImgUrl());
@@ -82,10 +115,10 @@ public class CourseServiceImplement implements CourseService {
         existingCourse.setPrice(courseDTO.getPrice());
         existingCourse.setStatus(courseDTO.getStatus());
 
-        existingCourse.setInstructor(instructor);
-
+        // Lưu thông tin khóa học đã cập nhật
         CourseEntity updatedCourse = courseRepository.save(existingCourse);
 
+        // Chuyển đổi sang DTO và trả về
         return convertToDto(updatedCourse);
     }
 
