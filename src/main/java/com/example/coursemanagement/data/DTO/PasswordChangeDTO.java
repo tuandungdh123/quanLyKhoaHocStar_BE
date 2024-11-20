@@ -14,4 +14,5 @@ public class PasswordChangeDTO {
     private String currentPassword;
     private String newPassword;
     private String confirmPassword;
+    private Integer roleId;
 }
