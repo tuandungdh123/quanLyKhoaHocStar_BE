@@ -1,6 +1,7 @@
 package com.example.coursemanagement.service.Implement;
 
 import com.example.coursemanagement.data.DTO.EnrollmentDTO;
+import com.example.coursemanagement.data.DTO.UpdateEnrollmentStatusDTO;
 import com.example.coursemanagement.data.Enums.PaymentStatus;
 import com.example.coursemanagement.data.entity.CourseEntity;
 import com.example.coursemanagement.data.entity.EnrollmentEntity;
@@ -87,13 +88,18 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     }
 
     @Override
-    public EnrollmentDTO updateEnrollmentStatus(EnrollmentDTO enrollmentDTO) {
-        EnrollmentEntity enrollmentEntity = enrollmentRepository.findById(enrollmentDTO.getEnrollmentId())
+    public UpdateEnrollmentStatusDTO updateEnrollmentStatus(UpdateEnrollmentStatusDTO updateEnrollmentStatusDTO) {
+        EnrollmentEntity enrollmentEntity = enrollmentRepository.findById(updateEnrollmentStatusDTO.getEnrollmentId())
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND, "Enrollment ID không hợp lệ."));
 
-        enrollmentEntity.setStatus(EnrollmentEntity.EnrollmentStatus.valueOf(enrollmentDTO.getStatus().name()));
+        try {
+            enrollmentEntity.setStatus(EnrollmentEntity.EnrollmentStatus.valueOf(updateEnrollmentStatusDTO.getStatus()));
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS, "Status không hợp lệ: " + updateEnrollmentStatusDTO.getStatus());
+        }
+
         EnrollmentEntity updatedEntity = enrollmentRepository.save(enrollmentEntity);
-        return convertToDTO(updatedEntity);
+        return convertUpdateEnrollmentStatusToDTO(updatedEntity);
     }
 
     @Override
@@ -118,6 +124,17 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         return null;
     }
 
+    @Override
+    public EnrollmentDTO getEnrollmentByUserIdAndCourseId(Integer userId, Integer courseId) {
+        Optional<EnrollmentEntity> enrollmentEntityOpt = enrollmentRepository.findByUser_UserIdAndCourse_CourseId(userId, courseId);
+
+        if (enrollmentEntityOpt.isPresent()) {
+            return convertToDTO(enrollmentEntityOpt.get());
+        } else {
+            throw new AppException(ErrorCode.ENROLLMENT_NOT_FOUND, "Không tìm thấy đăng ký cho người dùng này với khóa học này.");
+        }
+    }
+
     private EnrollmentDTO convertToDTO(EnrollmentEntity enrollmentEntity) {
         return EnrollmentDTO.builder()
                 .enrollmentId(enrollmentEntity.getEnrollmentId())
@@ -131,6 +148,13 @@ public class EnrollmentServiceImplement implements EnrollmentService {
                 .status(EnrollmentDTO.EnrollmentStatus.valueOf(enrollmentEntity.getStatus().name()))
                 .enrollmentDate(enrollmentEntity.getEnrollmentDate())
                 .paymentStatus(EnrollmentDTO.PaymentStatus.valueOf(enrollmentEntity.getPaymentStatus().name()))
+                .build();
+    }
+
+    private UpdateEnrollmentStatusDTO convertUpdateEnrollmentStatusToDTO(EnrollmentEntity entity) {
+        return UpdateEnrollmentStatusDTO.builder()
+                .enrollmentId(entity.getEnrollmentId())
+                .status(entity.getStatus().name())
                 .build();
     }
 
