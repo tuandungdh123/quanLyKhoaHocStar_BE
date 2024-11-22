@@ -1,13 +1,14 @@
 package com.example.coursemanagement.service;
 
 import com.example.coursemanagement.data.DTO.EnrollmentDTO;
+import com.example.coursemanagement.data.DTO.UpdateEnrollmentStatusDTO;
 
 import java.util.List;
 import java.util.Map;
 
 public interface EnrollmentService {
     List<EnrollmentDTO> getAllEnrollments();
-    EnrollmentDTO updateEnrollmentStatus(EnrollmentDTO enrollmentDTO);
+    UpdateEnrollmentStatusDTO updateEnrollmentStatus(UpdateEnrollmentStatusDTO updateEnrollmentStatusDTO);
     EnrollmentDTO getEnrollmentById(Integer enrollmentId);
     List<EnrollmentDTO> getEnrollmentsByCourseId(Integer courseId);
     EnrollmentDTO addEnrollment(EnrollmentDTO enrollmentDTO);
@@ -15,4 +16,5 @@ public interface EnrollmentService {
     EnrollmentDTO checkEnrollment(Integer userId, Integer courseId);
     Map<String, Long> getEnrollmentStatisticsByCoursePrice();
     Map<String, Double> getMonthlyRevenueStatistics();
+    EnrollmentDTO getEnrollmentByUserIdAndCourseId(Integer userId, Integer courseId);
 }
