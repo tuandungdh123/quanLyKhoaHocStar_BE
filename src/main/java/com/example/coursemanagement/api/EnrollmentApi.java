@@ -1,6 +1,7 @@
 package com.example.coursemanagement.api;
 
 import com.example.coursemanagement.data.DTO.EnrollmentDTO;
+import com.example.coursemanagement.data.DTO.UpdateEnrollmentStatusDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.EnrollmentService;
 import lombok.extern.slf4j.Slf4j;
@@ -50,12 +51,28 @@ public class EnrollmentApi {
         return resultApi;
     }
 
-    @PutMapping("/updateStatus")
-    public ResponseObject<?> updateEnrollmentStatus(@RequestBody EnrollmentDTO enrollmentDTO) {
+    @GetMapping("/get-enrollment-by-user-id-and-course-id")
+    public ResponseObject<?> getEnrollmentByUserIdAndCourseId(@RequestParam("userId") Integer userId, @RequestParam("courseId") Integer courseId) {
         var resultApi = new ResponseObject<>();
         try {
-            EnrollmentDTO updatedEnrollment = enrollmentService.updateEnrollmentStatus(enrollmentDTO);
-            resultApi.setData(updatedEnrollment);
+            EnrollmentDTO enrollmentDTO = enrollmentService.getEnrollmentByUserIdAndCourseId(userId, courseId);
+            resultApi.setData(enrollmentDTO);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Fetched enrollment successfully");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Failed to get enrollment by user ID {} and course ID {}: {}", userId, courseId, e.getMessage());
+        }
+        return resultApi;
+    }
+
+    @PutMapping("/update-enrollment-status")
+    public ResponseObject<?> updateEnrollmentStatus(@RequestBody UpdateEnrollmentStatusDTO requestData) {
+        var resultApi = new ResponseObject<>();
+        try {
+            UpdateEnrollmentStatusDTO updatedEnrollmentStatus = enrollmentService.updateEnrollmentStatus(requestData);
+            resultApi.setData(updatedEnrollmentStatus);
             resultApi.setSuccess(true);
             resultApi.setMessage("Enrollment status updated successfully");
         } catch (Exception e) {
@@ -65,6 +82,7 @@ public class EnrollmentApi {
         }
         return resultApi;
     }
+
 
     @GetMapping("/getEnrollmentByCourseId")
     public ResponseObject<?> getEnrollmentsByCourseId(@RequestParam("courseId") Integer courseId) {
