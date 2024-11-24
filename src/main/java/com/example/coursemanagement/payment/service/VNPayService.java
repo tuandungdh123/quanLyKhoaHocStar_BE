@@ -9,4 +9,6 @@ public interface VNPayService {
 
     String updatePaymentStatus(String transactionId, String paymentStatus);
 
+    String sendPaymentSuccessEmail(String transactionId, String paymentStatus);
+
 }

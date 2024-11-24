@@ -1,15 +1,19 @@
 package com.example.coursemanagement.payment.service.impl;
 
 import com.example.coursemanagement.data.entity.EnrollmentEntity;
+import com.example.coursemanagement.data.entity.UserEntity;
 import com.example.coursemanagement.payment.config.VNPayConfig;
 import com.example.coursemanagement.payment.data.PaymentEntity;
 import com.example.coursemanagement.payment.repository.PaymentTransactionRepository;
 import com.example.coursemanagement.payment.service.VNPayService;
 import com.example.coursemanagement.repository.EnrollmentRepository;
+import com.example.coursemanagement.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -28,6 +32,10 @@ public class VNPayServiceImpl implements VNPayService {
     private PaymentTransactionRepository paymentTransactionRepository;
     @Autowired
     private EnrollmentRepository enrollmentRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Override
     public String createOrder(int total, String orderInfo, String urlReturn, Integer enrollmentId) {
@@ -138,6 +146,7 @@ public class VNPayServiceImpl implements VNPayService {
         }
     }
 
+    @Override
     public String updatePaymentStatus(String transactionId, String paymentStatus) {
         // Tìm giao dịch theo transactionId
         PaymentEntity paymentEntity = paymentTransactionRepository.findByTransactionId(transactionId);
@@ -157,7 +166,92 @@ public class VNPayServiceImpl implements VNPayService {
         enrollmentEntity.setPaymentStatus(EnrollmentEntity.PaymentStatus.valueOf(paymentStatus));
         enrollmentRepository.save(enrollmentEntity);
 
+//        String courseName = enrollmentEntity.getCourse().getTitle();
+//        String userName = enrollmentEntity.getUser().getName();
+//        String email = enrollmentEntity.getUser().getEmail();
+//
+//        if (email == null || email.isEmpty()) {
+//            log.error("Email không hợp lệ: {}", email);
+//            return "Email không hợp lệ.";
+//        } else {
+//            String emailBody = String.format(
+//                    "Xin chào %s,\n\n" +
+//                            "Chúng tôi rất vui thông báo rằng thanh toán của bạn cho khóa học **%s** đã thành công!\n" +
+//                            "Thông tin chi tiết:\n" +
+//                            "- Mã giao dịch: %s\n" +
+//                            "- Tên khóa học: %s\n" +
+//                            "- Số tiền: %,d VND\n\n" +
+//                            "Chúc bạn có một trải nghiệm học tập thú vị tại Star Dev.\n\n" +
+//                            "Trân trọng,\n" +
+//                            "Đội ngũ Star Dev",
+//                    userName,
+//                    courseName,
+//                    transactionId,
+//                    courseName,
+//                    paymentEntity.getAmount()
+//            );
+//            sendMail(email, "Xác nhận thanh toán thành công", emailBody);
+//        }
+
         return "Cập nhật trạng thái thanh toán thành công!";
+    }
+
+    @Override
+    public String sendPaymentSuccessEmail(String transactionId, String paymentStatus) {
+        PaymentEntity paymentEntity = paymentTransactionRepository.findByTransactionId(transactionId);
+
+        if (paymentEntity == null) {
+            return "Không tìm thấy giao dịch với mã giao dịch " + transactionId;
+        }
+
+        EnrollmentEntity enrollmentEntity = enrollmentRepository.findByEnrollmentId(paymentEntity.getEnrollmentId());
+        if (enrollmentEntity == null) {
+            return "Không tìm thấy enrollment với enrollmentId " + paymentEntity.getEnrollmentId();
+        }
+
+        String courseName = enrollmentEntity.getCourse().getTitle();
+        String userName = enrollmentEntity.getUser().getName();
+        String email = enrollmentEntity.getUser().getEmail();
+
+        if (email == null || email.isEmpty()) {
+            log.error("Email không hợp lệ: {}", email);
+            return "Email không hợp lệ.";
+        } else {
+            String emailBody = String.format(
+                    "Xin chào %s,\n\n" +
+                            "Chúng tôi rất vui thông báo rằng thanh toán của bạn cho khóa học **%s** đã thành công!\n" +
+                            "Thông tin chi tiết:\n" +
+                            "- Mã giao dịch: %s\n" +
+                            "- Tên khóa học: %s\n" +
+                            "- Số tiền: %,d VND\n\n" +
+                            "Chúc bạn có một trải nghiệm học tập thú vị tại Star Dev.\n\n" +
+                            "Trân trọng,\n" +
+                            "Đội ngũ Star Dev",
+                    userName,
+                    courseName,
+                    transactionId,
+                    courseName,
+                    paymentEntity.getAmount()
+            );
+            sendMail(email, "Xác nhận thanh toán thành công", emailBody);
+        }
+
+        return "Cập nhật trạng thái thanh toán thành công!";
+    }
+
+    public void sendMail(String to, String subject, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(body);
+            message.setFrom("${spring.mail.username}");
+
+            mailSender.send(message);
+            log.info("Email đã được gửi thành công tới {}", to);
+        } catch (Exception e) {
+            log.error("Không thể gửi email tới {}: {}", to, e.getMessage());
+        }
     }
 }
 
