@@ -53,4 +53,9 @@ public class VNPayApi {
     public String updatePaymentStatus(@RequestBody PaymentStatusRequest paymentStatusRequest) {
         return vnPayService.updatePaymentStatus(paymentStatusRequest.getTransactionId(), paymentStatusRequest.getPaymentStatus());
     }
+
+    @PostMapping("/send-payment-success-email")
+    public String sendPaymentSuccessEmail(@RequestBody PaymentStatusRequest paymentStatusRequest) {
+        return vnPayService.sendPaymentSuccessEmail(paymentStatusRequest.getTransactionId(), paymentStatusRequest.getPaymentStatus());
+    }
 }

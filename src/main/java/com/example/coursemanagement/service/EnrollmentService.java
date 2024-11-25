@@ -17,4 +17,5 @@ public interface EnrollmentService {
     Map<String, Long> getEnrollmentStatisticsByCoursePrice();
     Map<String, Double> getMonthlyRevenueStatistics();
     EnrollmentDTO getEnrollmentByUserIdAndCourseId(Integer userId, Integer courseId);
+    EnrollmentDTO completeCourse(Integer enrollmentId, String certificateUrl);
 }
