@@ -26,7 +26,8 @@ public enum ErrorCode {
     DUPLICATE_PROGRESS(2015, "Tiến trình học tập đã tồn tại"),
     INVALID_INSTRUCTOR(2016,"Giảng viên này không tồn tại" ),
     INVALID_INSTRUCTOR_ROLE(2017,"Bạn không phải là giảng viên" ),
-    DATABASE_ERROR(2018, "Lỗi database");
+    DATABASE_ERROR(2018, "Lỗi database"),
+    INTERNAL_SERVER_ERROR( 2019,"Failed to generate certificate");
 
 
     private final int code;
