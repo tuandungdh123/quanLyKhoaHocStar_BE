@@ -80,7 +80,6 @@ public class FileUploadApi {
         }
     }
 
-    // Xử lý ngoại lệ chung
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
