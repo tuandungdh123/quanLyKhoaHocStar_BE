@@ -1,6 +1,5 @@
 package com.example.coursemanagement.api;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,43 +18,72 @@ import java.nio.file.StandardCopyOption;
 @CrossOrigin(origins = "*")
 public class FileUploadApi {
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    // API upload ảnh background-course
+    @PostMapping("/upload-background")
+    public ResponseEntity<?> uploadBackgroundCourse(@RequestParam("file") MultipartFile file) {
         try {
-            String uploadDir = "D:/React/DATN/quanLyKhoaHocStar/src/assets/images/Background/background-course";
-            Path upload = Paths.get(uploadDir);
-            if (!Files.exists(upload)) {
-                Files.createDirectories(upload);
-            }
-            Path filPath = upload.resolve(file.getOriginalFilename());
-            Files.copy(file.getInputStream(), filPath, StandardCopyOption.REPLACE_EXISTING);
+            // Cập nhật đường dẫn mới cho ảnh background
+            String uploadDir = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\background-course";
+            Path uploadPath = Paths.get(uploadDir);
 
-            return ResponseEntity.ok().body("File uploaded successfully!");
+            // Kiểm tra và tạo thư mục nếu chưa có
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName = file.getOriginalFilename();
+            System.out.println("Uploaded file: " + fileName);
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // Trả về URL của ảnh background
+            String backgroundUrl = "/background-course/" + fileName;
+            return ResponseEntity.ok().body(backgroundUrl);
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while uploading the file: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while uploading the file: " + e.getMessage());
         }
     }
 
-    @PostMapping("/upload_certification")
-    public ResponseEntity<String> uploadFileCertification(@RequestParam("file") MultipartFile file) {
+    // API upload ảnh avatar
+    @PostMapping("/upload-avatar")
+    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("No file provided");
+        }
+        if (file == null || file.isEmpty()) {
+            System.out.println("No file was uploaded");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No file provided");
+        }
         try {
-            String uploadDir = "D:/React/DATN/quanLyKhoaHocStar/src/assets/images/Certification";
-            Path upload = Paths.get(uploadDir);
-            if (!Files.exists(upload)) {
-                Files.createDirectories(upload);
-            }
-            Path filPath = upload.resolve(file.getOriginalFilename());
-            Files.copy(file.getInputStream(), filPath, StandardCopyOption.REPLACE_EXISTING);
+            // Cập nhật đường dẫn mới cho ảnh avatar
+            String uploadDir = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\Avatar-Account";
+            Path uploadPath = Paths.get(uploadDir);
 
-            return ResponseEntity.ok().body("File uploaded successfully!");
+            // Kiểm tra và tạo thư mục nếu chưa có
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName = file.getOriginalFilename();
+            assert fileName != null;
+            System.out.println("Uploaded file: " + fileName);
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // Trả về URL của ảnh avatar
+            String avatarUrl = "/Avatar-Account/" + fileName;
+            return ResponseEntity.ok().body(avatarUrl); // Trả về URL của ảnh
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while uploading the file: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while uploading the file: " + e.getMessage() + " at " + e.getStackTrace());
         }
     }
 
+    // Xử lý ngoại lệ chung
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("An error occurred while processing the request: " + e.getMessage());
     }
-
 }
