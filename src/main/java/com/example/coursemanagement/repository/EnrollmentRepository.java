@@ -27,5 +27,6 @@ public interface EnrollmentRepository extends JpaRepository<EnrollmentEntity, In
     List<Object[]> calculateMonthlyRevenue();
 
 
+
     EnrollmentEntity findByEnrollmentId(Integer enrollmentId);
 }
