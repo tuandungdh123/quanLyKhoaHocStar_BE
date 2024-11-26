@@ -1,5 +1,6 @@
 package com.example.coursemanagement.service.Implement;
 
+import com.example.coursemanagement.constant.CertificateGenerator;
 import com.example.coursemanagement.data.DTO.EnrollmentDTO;
 import com.example.coursemanagement.data.DTO.UpdateEnrollmentStatusDTO;
 import com.example.coursemanagement.data.Enums.PaymentStatus;
@@ -135,6 +136,26 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         }
     }
 
+    @Override
+    public EnrollmentDTO completeCourse(Integer enrollmentId, String certificateUrl) {
+        EnrollmentEntity enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND, "Enrollment ID không tìm thấy."));
+
+        enrollment.completeCourse(certificateUrl);
+
+        String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\src\\assets\\images\\certificate\\certificate_" + enrollmentId + ".pdf";
+        try {
+            CertificateGenerator.generateCertificate(enrollment.getUser().getName(), enrollment.getCourse().getTitle(), certificateFilePath);
+            System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to generate certificate: " + e.getMessage());
+        }
+
+        enrollmentRepository.save(enrollment);
+
+        return convertToDTO(enrollment);
+    }
+
     private EnrollmentDTO convertToDTO(EnrollmentEntity enrollmentEntity) {
         return EnrollmentDTO.builder()
                 .enrollmentId(enrollmentEntity.getEnrollmentId())
@@ -150,6 +171,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
                 .paymentStatus(EnrollmentDTO.PaymentStatus.valueOf(enrollmentEntity.getPaymentStatus().name()))
                 .build();
     }
+
 
     private UpdateEnrollmentStatusDTO convertUpdateEnrollmentStatusToDTO(EnrollmentEntity entity) {
         return UpdateEnrollmentStatusDTO.builder()

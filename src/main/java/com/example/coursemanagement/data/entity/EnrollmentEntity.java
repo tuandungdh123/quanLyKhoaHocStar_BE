@@ -31,11 +31,17 @@ public class EnrollmentEntity {
     private EnrollmentStatus status;
 
     @Column(name = "enrollment_date", updatable = false)
-    private LocalDateTime enrollmentDate = LocalDateTime.now(); // Khởi tạo thời gian ghi danh
+    private LocalDateTime enrollmentDate = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
+
+    @Column(name = "certificate_url")
+    private String certificateUrl;
+
+    @Column(name = "issue_date")
+    private LocalDateTime issueDate;
 
     public enum EnrollmentStatus {
         completed,
@@ -47,4 +53,14 @@ public class EnrollmentEntity {
         completed,
         failed
     }
+
+    public void completeCourse(String certificateUrl) {
+        if (this.status == EnrollmentStatus.completed) {
+            throw new IllegalStateException("Course already completed.");
+        }
+        this.status = EnrollmentStatus.completed;
+        this.certificateUrl = certificateUrl;
+        this.issueDate = LocalDateTime.now();
+    }
+
 }

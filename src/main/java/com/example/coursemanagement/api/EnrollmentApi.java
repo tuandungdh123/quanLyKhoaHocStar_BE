@@ -175,4 +175,24 @@ public class EnrollmentApi {
         return resultApi;
     }
 
+    @PutMapping("/completeCourse")
+    public ResponseObject<?> completeCourse(@RequestParam("enrollmentId") Integer enrollmentId,
+                                            @RequestParam("certificateUrl") String certificateUrl) {
+        var resultApi = new ResponseObject<>();
+        try {
+            EnrollmentDTO updatedEnrollment = enrollmentService.completeCourse(enrollmentId, certificateUrl);
+
+            resultApi.setData(updatedEnrollment);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Course completed and certificate issued successfully.");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Failed to complete course for enrollment ID: {}", enrollmentId, e);
+        }
+        return resultApi;
+    }
+
+
+
 }
