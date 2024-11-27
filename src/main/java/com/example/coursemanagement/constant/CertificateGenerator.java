@@ -36,7 +36,7 @@ public class CertificateGenerator {
         document.open();
 
         // **1. Thêm hình nền (Background Image)**
-        Image background = Image.getInstance("C:/Users/phuct/DATN/quanLyKhoaHocStar/src/assets/images/certificate/certificate-background.jpg");
+        Image background = Image.getInstance("C:/Users/phuct/DATN/quanLyKhoaHocStar/public/certificate/Certificate-bg.png");
 
         float imgWidth = background.getWidth();
         float imgHeight = background.getHeight();
@@ -84,7 +84,7 @@ public class CertificateGenerator {
     public static void main(String[] args) {
         try {
             // Đường dẫn file PDF sẽ được lưu vào
-            String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\src\\assets\\images\\certificate\\certificate_half_height.pdf";
+            String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\certificate\\certificate_half_height.pdf";
 
             // Gọi phương thức tạo chứng chỉ PDF
             generateCertificate("Lê Thanh Tùng", "Kiểm thử dự án trên nền tảng web", certificateFilePath);

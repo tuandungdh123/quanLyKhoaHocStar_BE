@@ -143,7 +143,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         enrollment.completeCourse(certificateUrl);
 
-        String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\src\\assets\\images\\certificate\\certificate_" + enrollmentId + ".pdf";
+        String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\certificate\\certificate_" + enrollmentId + ".pdf";
         try {
             CertificateGenerator.generateCertificate(enrollment.getUser().getName(), enrollment.getCourse().getTitle(), certificateFilePath);
             System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);
