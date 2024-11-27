@@ -143,7 +143,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         enrollment.completeCourse(certificateUrl);
 
-        String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\src\\assets\\images\\certificate\\certificate_" + enrollmentId + ".pdf";
+        String certificateFilePath = "D:\\React\\DATN\\quanLyKhoaHocStar\\src\\assets\\images\\certificate\\certificate_" + enrollmentId + ".pdf";
         try {
             CertificateGenerator.generateCertificate(enrollment.getUser().getName(), enrollment.getCourse().getTitle(), certificateFilePath);
             System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);
@@ -169,6 +169,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
                 .status(EnrollmentDTO.EnrollmentStatus.valueOf(enrollmentEntity.getStatus().name()))
                 .enrollmentDate(enrollmentEntity.getEnrollmentDate())
                 .paymentStatus(EnrollmentDTO.PaymentStatus.valueOf(enrollmentEntity.getPaymentStatus().name()))
+                .certificateUrl(enrollmentEntity.getCertificateUrl())
                 .build();
     }
 
