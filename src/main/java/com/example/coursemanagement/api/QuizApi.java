@@ -1,11 +1,14 @@
 package com.example.coursemanagement.api;
 
+import com.example.coursemanagement.data.DTO.LessonDTO;
 import com.example.coursemanagement.data.DTO.QuizDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.service.QuizService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -41,6 +44,21 @@ public class QuizApi {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
             log.error("Fail When Call API /api/v1/Quiz/getQuizById ", e);
+        }
+        return resultApi;
+    }
+
+    @GetMapping("/getQuizByModuleId")
+    public ResponseObject<?> getQuizByModuleId(@RequestParam Integer moduleId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            resultApi.setData(quizService.getQuizByModuleId(moduleId));
+            resultApi.setSuccess(true);
+            resultApi.setMessage("getQuizByModuleId success");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Fail When Call API /api/v1/Quiz/getQuizByModuleId ", e);
         }
         return resultApi;
     }

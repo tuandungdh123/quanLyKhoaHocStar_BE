@@ -46,6 +46,21 @@ public class QuestionApi {
         return resultApi;
     }
 
+    @GetMapping("/getQuestionByQuizId")
+    public ResponseObject<?> getQuestionByQuizId(@RequestParam Integer quizId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            resultApi.setData(questionService.getQuestionByQuizId(quizId));
+            resultApi.setSuccess(true);
+            resultApi.setMessage("getQuestionByQuizId success");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Fail When Call API /api/v1/question/getQuestionByQuizId?id=" + quizId, e);
+        }
+        return resultApi;
+    }
+
     @PostMapping("/create")
     public ResponseObject<?> createQuestion(@RequestBody QuestionDTO questionDTO) {
         var resultApi = new ResponseObject<>();
