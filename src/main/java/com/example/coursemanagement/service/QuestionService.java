@@ -11,4 +11,5 @@ public interface QuestionService {
     QuestionDTO createQuestion(QuestionDTO questionDTO);
     QuestionDTO updateQuestion(Integer id, QuestionDTO questionDTO);
     void deleteQuestion(Integer id);
+    List<QuestionDTO> getQuestionByQuizId(Integer quizId);
 }

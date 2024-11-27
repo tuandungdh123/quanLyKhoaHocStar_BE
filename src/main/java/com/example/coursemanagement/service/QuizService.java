@@ -10,4 +10,5 @@ public interface QuizService {
     QuizDTO createQuiz(QuizDTO quizDTO);
     QuizDTO updateQuiz(Integer quizId, QuizDTO quizDTO);
     void deleteQuiz(Integer quizId);
+    List<QuizDTO> getQuizByModuleId(Integer moduleId);
 }

@@ -46,6 +46,21 @@ public class ChoiceApi {
         return resultApi;
     }
 
+    @GetMapping("/getChoiceByQuestionId")
+    public ResponseObject<?> getChoiceByQuestionId(@RequestParam Integer questionId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            resultApi.setData(choiceService.getChoiceByQuestionId(questionId));
+            resultApi.setSuccess(true);
+            resultApi.setMessage("getChoiceByQuestionId success");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Fail When Call API /api/v1/choice/getByQuestionId?id=" + questionId, e);
+        }
+        return resultApi;
+    }
+
     @PostMapping("/create")
     public ResponseObject<?> createChoice(@RequestBody ChoiceDTO choiceDTO) {
         var resultApi = new ResponseObject<>();

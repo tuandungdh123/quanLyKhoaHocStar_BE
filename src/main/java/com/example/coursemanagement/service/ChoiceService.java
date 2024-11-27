@@ -10,4 +10,5 @@ public interface ChoiceService {
     ChoiceDTO createChoice(ChoiceDTO choiceDTO);
     ChoiceDTO updateChoice(ChoiceDTO choiceDTO);
     void deleteChoice(Integer choiceId);
+    List<ChoiceDTO> getChoiceByQuestionId(Integer questionId);
 }

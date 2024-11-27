@@ -36,6 +36,13 @@ public class ChoiceServiceImplement implements ChoiceService {
     }
 
     @Override
+    public List<ChoiceDTO> getChoiceByQuestionId(Integer questionId) {
+        return choiceRepository.findByQuestion_QuestionId(questionId).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ChoiceDTO createChoice(ChoiceDTO choiceDTO) {
         QuestionEntity question = questionRepository.findById(choiceDTO.getQuestionId())
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, "Không tìm thấy câu hỏi với ID: " + choiceDTO.getQuestionId() + ". Vui lòng kiểm tra lại."));
