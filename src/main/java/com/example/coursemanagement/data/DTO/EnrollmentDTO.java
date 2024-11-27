@@ -23,6 +23,7 @@ public class EnrollmentDTO {
     private EnrollmentStatus status;
     private LocalDateTime enrollmentDate = Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime();
     private PaymentStatus paymentStatus;
+    private String certificateUrl;
 
     public enum EnrollmentStatus {
         completed,

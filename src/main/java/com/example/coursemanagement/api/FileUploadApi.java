@@ -23,7 +23,7 @@ public class FileUploadApi {
     public ResponseEntity<?> uploadBackgroundCourse(@RequestParam("file") MultipartFile file) {
         try {
             // Cập nhật đường dẫn mới cho ảnh background
-            String uploadDir = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\background-course";
+            String uploadDir = "D:\\React\\DATN\\quanLyKhoaHocStar\\public\\background-course";
             Path uploadPath = Paths.get(uploadDir);
 
             // Kiểm tra và tạo thư mục nếu chưa có
