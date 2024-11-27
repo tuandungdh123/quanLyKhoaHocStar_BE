@@ -169,6 +169,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
                 .status(EnrollmentDTO.EnrollmentStatus.valueOf(enrollmentEntity.getStatus().name()))
                 .enrollmentDate(enrollmentEntity.getEnrollmentDate())
                 .paymentStatus(EnrollmentDTO.PaymentStatus.valueOf(enrollmentEntity.getPaymentStatus().name()))
+                .certificateUrl(enrollmentEntity.getCertificateUrl())
                 .build();
     }
 
