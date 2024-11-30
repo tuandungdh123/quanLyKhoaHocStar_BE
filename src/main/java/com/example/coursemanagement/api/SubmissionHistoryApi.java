@@ -24,15 +24,15 @@ public class SubmissionHistoryApi {
         try {
             resultApi.setData(submissionHistoryService.getAllSubmissionHistories());
             resultApi.setSuccess(true);
-            resultApi.setMessage("getAllModule success");
+            resultApi.setMessage("getAllSubmissionHistory success");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/module/getAllCourse ", e);
+            log.error("Fail When Call API /api/v1/history/getAllSubmissionHistory ", e);
         }
         return resultApi;
     }
-    @PostMapping("/saveCourse")
+    @PostMapping("/saveSubmissionHistory")
     public ResponseObject<?> doPostSaveSubmissionHistory(@Valid @RequestBody SubmissionHistoryDTO submissionHistoryDTO) {
         var resultApi = new ResponseObject<>();
         try {
@@ -43,21 +43,51 @@ public class SubmissionHistoryApi {
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(ApiMessage.BasicMessageApi.FAIL.getBasicMessageApi());
-            log.error("Failed to add product: ", e);
+            log.error("Fail When Call API /api/v1/history/saveSubmissionHistory", e);
         }
         return resultApi;
     }
     @GetMapping("/getSubmissionHistoryById")
-    public ResponseObject<?> getSubmissionHistoryById(@RequestBody SubmissionHistoryDTO submissionHistoryDTO) {
+    public ResponseObject<?> getSubmissionHistoryById(@RequestParam Integer submissionHistoryId) {
         var resultApi = new ResponseObject<>();
         try {
-            resultApi.setData(submissionHistoryService.getSubmissionHistoryById(submissionHistoryDTO.getHistoryId()));
+            resultApi.setData(submissionHistoryService.getSubmissionHistoryById(submissionHistoryId));
             resultApi.setSuccess(true);
-            resultApi.setMessage("getMeetingScheduleById success");
+            resultApi.setMessage("getSubmissionHistoryById success");
         } catch (Exception e) {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
-            log.error("Fail When Call API /api/v1/meeting-schedule/getById", e);
+            log.error("Fail When Call API /api/v1/history/getSubmissionHistoryById", e);
+        }
+        return resultApi;
+    }
+
+    @GetMapping("/getSubmissionHistoriesByModuleId")
+    public ResponseObject<?> getSubmissionHistoriesByModuleId(@RequestParam Integer moduleId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            resultApi.setData(submissionHistoryService.getSubmissionHistoriesByModuleId(moduleId));
+            resultApi.setSuccess(true);
+            resultApi.setMessage("getSubmissionHistoriesByModuleId success");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Fail When Call API /api/v1/history/getSubmissionHistoriesByModuleId", e);
+        }
+        return resultApi;
+    }
+
+    @GetMapping("/getSubmissionHistoriesByUserIdAndCourseId")
+    public ResponseObject<?> getSubmissionHistoriesByUserIdAndCourseId(@RequestParam Integer userId, @RequestParam Integer courseId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            resultApi.setData(submissionHistoryService.getSubmissionHistoriesByUserIdAndCourseId(userId, courseId));
+            resultApi.setSuccess(true);
+            resultApi.setMessage("getSubmissionHistoriesByUserIdAndCourseId success");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Fail When Call API /api/v1/history/getSubmissionHistoriesByUserIdAndCourseId", e);
         }
         return resultApi;
     }

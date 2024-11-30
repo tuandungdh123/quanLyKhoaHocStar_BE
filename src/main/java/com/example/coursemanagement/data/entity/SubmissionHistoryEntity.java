@@ -33,10 +33,6 @@ public class SubmissionHistoryEntity {
     @JoinColumn(name = "quiz_id", nullable = false)
     private QuizEntity quiz;
 
-    @ManyToOne
-    @JoinColumn(name = "question_id", nullable = false)
-    private QuestionEntity question;
-
     private Double score;
 
     @Column(nullable = false)

@@ -22,7 +22,6 @@ public class SubmissionHistoryServiceImplement implements SubmissionHistoryServi
     private final CourseRepository courseRepository;
     private final ModuleRepository moduleRepository;
     private final QuizRepository quizRepository;
-    private final QuestionRepository questionRepository;
 
     @Override
     public List<SubmissionHistoryDTO> getAllSubmissionHistories() {
@@ -34,16 +33,54 @@ public class SubmissionHistoryServiceImplement implements SubmissionHistoryServi
 
     @Override
     public SubmissionHistoryDTO saveSubmissionHistory(SubmissionHistoryDTO submissionHistoryDTO) {
+        // Kiểm tra dữ liệu: Các trường bắt buộc không được null
+        if (submissionHistoryDTO.getUserId() == null ||
+                submissionHistoryDTO.getCourseId() == null ||
+                submissionHistoryDTO.getModuleId() == null ||
+                submissionHistoryDTO.getQuizId() == null) {
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS,
+                    "UserId, CourseId, ModuleId và QuizId là bắt buộc.");
+        }
+
+        // Kiểm tra xem lịch sử nộp bài đã tồn tại hay chưa (nếu cần)
+        Optional<SubmissionHistoryEntity> existingHistory = submissionHistoryRepository
+                .findByUser_UserIdAndCourse_CourseIdAndModule_ModuleIdAndQuiz_QuizId(
+                        submissionHistoryDTO.getUserId(),
+                        submissionHistoryDTO.getCourseId(),
+                        submissionHistoryDTO.getModuleId(),
+                        submissionHistoryDTO.getQuizId()
+                );
+
+        if (existingHistory.isPresent()) {
+            throw new AppException(ErrorCode.DUPLICATE_SUBMISSION, "Lịch sử nộp bài đã tồn tại.");
+        }
+
         SubmissionHistoryEntity entity = convertToEntity(submissionHistoryDTO);
         SubmissionHistoryEntity savedEntity = submissionHistoryRepository.save(entity);
+
         return convertToDTO(savedEntity);
     }
+
 
     @Override
     public SubmissionHistoryDTO getSubmissionHistoryById(Integer submissionHistoryId) {
         SubmissionHistoryEntity submissionHistoryEntity = submissionHistoryRepository.findById(submissionHistoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND, "Không tìm thấy bản ghi với ID: " + submissionHistoryId));
         return convertToDTO(submissionHistoryEntity);
+    }
+
+    @Override
+    public List<SubmissionHistoryDTO> getSubmissionHistoriesByModuleId(Integer moduleId) {
+        return submissionHistoryRepository.findByModule_ModuleId(moduleId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SubmissionHistoryDTO> getSubmissionHistoriesByUserIdAndCourseId(Integer userId, Integer courseId) {
+        return submissionHistoryRepository.findByUser_UserIdAndCourse_CourseId(userId, courseId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public SubmissionHistoryDTO convertToDTO(SubmissionHistoryEntity submissionHistoryEntity) {
@@ -53,7 +90,6 @@ public class SubmissionHistoryServiceImplement implements SubmissionHistoryServi
         dto.setCourseId(submissionHistoryEntity.getCourse() != null ? submissionHistoryEntity.getCourse().getCourseId() : null);
         dto.setModuleId(submissionHistoryEntity.getModule() != null ? submissionHistoryEntity.getModule().getModuleId() : null);
         dto.setQuizId(submissionHistoryEntity.getQuiz() != null ? submissionHistoryEntity.getQuiz().getQuizId() : null);
-        dto.setQuestionId(submissionHistoryEntity.getQuestion() != null ? submissionHistoryEntity.getQuestion().getQuestionId() : null);
         dto.setScore(submissionHistoryEntity.getScore());
         dto.setAssignmentStatus(submissionHistoryEntity.getAssignmentStatus());
         dto.setCreatedAt(submissionHistoryEntity.getCreatedAt());
@@ -68,13 +104,11 @@ public class SubmissionHistoryServiceImplement implements SubmissionHistoryServi
         Optional<CourseEntity> course = courseRepository.findById(submissionHistoryDTO.getCourseId());
         Optional<ModuleEntity> module = moduleRepository.findById(submissionHistoryDTO.getModuleId());
         Optional<QuizEntity> quiz = quizRepository.findById(submissionHistoryDTO.getQuizId());
-        Optional<QuestionEntity> question = questionRepository.findById(submissionHistoryDTO.getQuestionId());
 
         user.ifPresent(entity::setUser);
         course.ifPresent(entity::setCourse);
         module.ifPresent(entity::setModule);
         quiz.ifPresent(entity::setQuiz);
-        question.ifPresent(entity::setQuestion);
 
         entity.setScore(submissionHistoryDTO.getScore());
         entity.setAssignmentStatus(submissionHistoryDTO.getAssignmentStatus());
