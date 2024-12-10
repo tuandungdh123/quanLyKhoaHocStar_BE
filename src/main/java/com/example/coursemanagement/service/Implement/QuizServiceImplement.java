@@ -45,6 +45,13 @@ public class QuizServiceImplement implements QuizService {
     }
 
     @Override
+    public List<QuizDTO> getQuizByModuleId(Integer moduleId) {
+        return quizRepository.findByModule_ModuleId(moduleId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public QuizDTO createQuiz(QuizDTO quizDTO) {
         QuizEntity quizEntity = convertToEntity(quizDTO);
         QuizEntity savedQuiz = quizRepository.save(quizEntity);

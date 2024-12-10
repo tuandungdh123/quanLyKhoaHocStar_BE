@@ -34,6 +34,11 @@ public class QuestionServiceImplement implements QuestionService {
     }
 
     @Override
+    public List<QuestionDTO> getQuestionByQuizId(Integer quizId) {
+        return questionRepository.findByQuiz_QuizId(quizId).stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
     public QuestionDTO createQuestion(QuestionDTO questionDTO) {
         QuizEntity quizEntity = quizRepository.findById(questionDTO.getQuizId())
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND, String.format("Quiz không tìm thấy với ID: %d", questionDTO.getQuizId())));

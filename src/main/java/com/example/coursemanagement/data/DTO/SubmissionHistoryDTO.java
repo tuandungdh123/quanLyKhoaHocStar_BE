@@ -15,7 +15,6 @@ public class SubmissionHistoryDTO {
     private Integer courseId;
     private Integer moduleId;
     private Integer quizId;
-    private Integer questionId;
     private Double score;
     private Boolean assignmentStatus;
     private LocalDateTime createdAt;

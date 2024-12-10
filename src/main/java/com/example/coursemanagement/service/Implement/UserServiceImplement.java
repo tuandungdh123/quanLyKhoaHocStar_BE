@@ -50,17 +50,25 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
+    public boolean isEmailExist(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean isPhoneExist(String phone) {
+        return userRepository.existsByPhone(phone);
+    }
+
+    @Override
     public void registerUser(UserDTO userDTO) {
+
         String encodedPassword = passwordEncoder.encode(userDTO.getPasswordHash());
         userDTO.setPasswordHash(encodedPassword);
-        String otp = generateOtp();
-        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(5);
-        otpStorage.put(userDTO.getEmail(), new OtpInfo(otp, expiryTime));
 
-        sendOtpEmail(userDTO.getEmail(), otp);
         UserEntity userEntity = convertToEntity(userDTO);
         userRepository.save(userEntity);
     }
+
 
     @Override
     public UserDTO loginUser(UserDTO userDTO) {
@@ -131,25 +139,40 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public void sendOtpEmail(String toEmail, String otpCode) {
+    public void sendOtpEmail(String email) {
+//        if (email == null || !email.matches("^(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:\\\\[\\x01-\\x7F]|[^\\\"])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}|\\[(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:[\\x01-\\x7F]+)\\])$")) {
+//            throw new IllegalArgumentException("Email không hợp lệ");
+//        }
+
+        String otp = generateOtp();
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(5);
+        otpStorage.put(email, new OtpInfo(otp, expiryTime));
+        sendOtpEmailToUser(email, otp);
+    }
+
+    @Override
+    public void sendOtpEmailToUser(String toEmail, String otpCode) {
         try {
+//            toEmail = toEmail.trim();
+//            if (!toEmail.matches("^(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:\\\\[\\x01-\\x7F]|[^\\\"])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}|\\[(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:[\\x01-\\x7F]+)\\])$")) {
+//                throw new IllegalArgumentException("Email không hợp lệ");
+//            }
+
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(toEmail);
             helper.setSubject("Xác thực mã OTP của bạn");
 
-            String htmlContent =
-                    "<div style='font-family:Arial, sans-serif; color:#333;'>" +
-                            "<h2 style='color: #4CAF50;'>Mã OTP của bạn</h2>" +
-                            "<p>Xin chào,</p>" +
-                            "<p>Bạn vừa yêu cầu mã OTP để xác thực tài khoản. Mã OTP của bạn là:</p>" +
-                            "<h1 style='text-align:center; color:#4CAF50;'>" + otpCode + "</h1>" +
-                            "<p><strong>Lưu ý:</strong> Mã này sẽ hết hạn sau 5 phút.</p>" +
-                            "<hr>" +
-                            "<p style='font-size:0.9em;'>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>" +
-                            "<p>Trân trọng,<br>Đội ngũ hỗ trợ của StarDev</p>" +
-                            "</div>";
+            String htmlContent = "<div style='font-family:Arial, sans-serif; color:#333;'>"
+                    + "<h2 style='color: #4CAF50;'>Mã OTP của bạn</h2>"
+                    + "<p>Bạn vừa yêu cầu mã OTP để xác thực tài khoản. Mã OTP của bạn là:</p>"
+                    + "<h1 style='text-align:center; color:#4CAF50;'>" + otpCode + "</h1>"
+                    + "<p><strong>Lưu ý:</strong> Mã này sẽ hết hạn sau 5 phút.</p>"
+                    + "<hr>"
+                    + "<p style='font-size:0.9em;'>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>"
+                    + "<p>Trân trọng,<br>Đội ngũ hỗ trợ của StarDev</p>"
+                    + "</div>";
 
             helper.setText(htmlContent, true);
             mailSender.send(message);

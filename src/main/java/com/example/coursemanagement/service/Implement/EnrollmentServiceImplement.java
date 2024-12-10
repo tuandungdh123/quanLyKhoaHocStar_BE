@@ -16,6 +16,7 @@ import com.example.coursemanagement.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,8 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     public List<EnrollmentDTO> getAllEnrollmentsByUserId(Integer userId) {
         List<EnrollmentEntity> enrollments = enrollmentRepository.findByUser_UserId(userId);
         if (enrollments.isEmpty()) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND, "Người dùng chưa đăng ký bất kỳ khóa học nào.");
+            return null;
+//            throw new AppException(ErrorCode.USER_NOT_FOUND, "Người dùng chưa đăng ký bất kỳ khóa học nào.");
         }
         return enrollments.stream()
                 .map(this::convertToDTO)
@@ -143,7 +145,8 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         enrollment.completeCourse(certificateUrl);
 
-        String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\src\\assets\\images\\certificate\\certificate_" + enrollmentId + ".pdf";
+        // Cập nhật đường dẫn chứng chỉ với đường dẫn đúng trên EC2
+        String certificateFilePath = "/var/www/stardev/html/certificate/certificate_" + enrollmentId + ".pdf";
         try {
             CertificateGenerator.generateCertificate(enrollment.getUser().getName(), enrollment.getCourse().getTitle(), certificateFilePath);
             System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);
@@ -169,6 +172,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
                 .status(EnrollmentDTO.EnrollmentStatus.valueOf(enrollmentEntity.getStatus().name()))
                 .enrollmentDate(enrollmentEntity.getEnrollmentDate())
                 .paymentStatus(EnrollmentDTO.PaymentStatus.valueOf(enrollmentEntity.getPaymentStatus().name()))
+                .certificateUrl(enrollmentEntity.getCertificateUrl())
                 .build();
     }
 
@@ -218,7 +222,17 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
     @Override
     public Map<String, Double> getMonthlyRevenueStatistics() {
-        List<Object[]> results = enrollmentRepository.calculateMonthlyRevenue();
+        return getMonthlyRevenueStatistics(LocalDate.now().getYear());
+    }
+
+    @Override
+    public List<Integer> getAvailableYears() {
+        return enrollmentRepository.findDistinctYears();
+    }
+
+    @Override
+    public Map<String, Double> getMonthlyRevenueStatistics(int year) {
+        List<Object[]> results = enrollmentRepository.calculateMonthlyRevenue(year);
         Map<String, Double> statistics = new HashMap<>();
 
         for (Object[] result : results) {

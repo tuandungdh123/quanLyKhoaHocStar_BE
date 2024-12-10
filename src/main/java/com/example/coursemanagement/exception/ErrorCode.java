@@ -27,7 +27,11 @@ public enum ErrorCode {
     INVALID_INSTRUCTOR(2016,"Giảng viên này không tồn tại" ),
     INVALID_INSTRUCTOR_ROLE(2017,"Bạn không phải là giảng viên" ),
     DATABASE_ERROR(2018, "Lỗi database"),
-    INTERNAL_SERVER_ERROR( 2019,"Failed to generate certificate");
+    INTERNAL_SERVER_ERROR( 2019,"Failed to generate certificate"),
+    DUPLICATE_SUBMISSION(2020, "Lịch sử nộp bài đã tồn tại"),
+    EMAIL_ALREADY_EXISTS(2021, "Email đã được đăng ký trên he thống"),
+    PHONE_ALREADY_EXISTS(2022, "Số điện thoại đã được đăng ký trên hệ thống"),
+    ;
 
 
     private final int code;

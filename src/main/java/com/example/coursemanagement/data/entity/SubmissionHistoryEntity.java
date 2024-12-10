@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Data
-@Table(name = "Submission_History")
+@Table(name = "submission_history")
 public class SubmissionHistoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,10 +32,6 @@ public class SubmissionHistoryEntity {
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
     private QuizEntity quiz;
-
-    @ManyToOne
-    @JoinColumn(name = "question_id", nullable = false)
-    private QuestionEntity question;
 
     private Double score;
 

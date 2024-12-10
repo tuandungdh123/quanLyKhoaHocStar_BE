@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Modules")
+@Table(name = "modules")
 public class ModuleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
