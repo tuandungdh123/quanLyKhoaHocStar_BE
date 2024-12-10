@@ -33,8 +33,6 @@ public class VNPayServiceImpl implements VNPayService {
     @Autowired
     private EnrollmentRepository enrollmentRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private JavaMailSender mailSender;
 
     @Override

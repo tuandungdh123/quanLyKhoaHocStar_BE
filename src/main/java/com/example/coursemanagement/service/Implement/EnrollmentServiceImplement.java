@@ -82,7 +82,8 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     public List<EnrollmentDTO> getAllEnrollmentsByUserId(Integer userId) {
         List<EnrollmentEntity> enrollments = enrollmentRepository.findByUser_UserId(userId);
         if (enrollments.isEmpty()) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND, "Người dùng chưa đăng ký bất kỳ khóa học nào.");
+            return null;
+//            throw new AppException(ErrorCode.USER_NOT_FOUND, "Người dùng chưa đăng ký bất kỳ khóa học nào.");
         }
         return enrollments.stream()
                 .map(this::convertToDTO)
@@ -144,7 +145,8 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         enrollment.completeCourse(certificateUrl);
 
-        String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\certificate\\certificate_" + enrollmentId + ".pdf";
+        // Cập nhật đường dẫn chứng chỉ với đường dẫn đúng trên EC2
+        String certificateFilePath = "/var/www/stardev/html/certificate/certificate_" + enrollmentId + ".pdf";
         try {
             CertificateGenerator.generateCertificate(enrollment.getUser().getName(), enrollment.getCourse().getTitle(), certificateFilePath);
             System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);

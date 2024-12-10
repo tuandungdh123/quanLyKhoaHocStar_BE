@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Roles")
+@Table(name = "roles")
 public class RoleEntity {
     private static final long serialVersionUID = 1L;
 
