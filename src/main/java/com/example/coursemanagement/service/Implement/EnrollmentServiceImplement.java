@@ -16,6 +16,7 @@ import com.example.coursemanagement.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,7 +220,17 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
     @Override
     public Map<String, Double> getMonthlyRevenueStatistics() {
-        List<Object[]> results = enrollmentRepository.calculateMonthlyRevenue();
+        return getMonthlyRevenueStatistics(LocalDate.now().getYear());
+    }
+
+    @Override
+    public List<Integer> getAvailableYears() {
+        return enrollmentRepository.findDistinctYears();
+    }
+
+    @Override
+    public Map<String, Double> getMonthlyRevenueStatistics(int year) {
+        List<Object[]> results = enrollmentRepository.calculateMonthlyRevenue(year);
         Map<String, Double> statistics = new HashMap<>();
 
         for (Object[] result : results) {

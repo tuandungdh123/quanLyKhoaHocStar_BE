@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -138,11 +139,18 @@ public class EnrollmentApi {
         return ResponseEntity.ok(statistics);
     }
 
+    @GetMapping("/years")
+    public ResponseEntity<List<Integer>> getAvailableYears() {
+        List<Integer> years = enrollmentService.getAvailableYears();
+        return ResponseEntity.ok(years);
+    }
+
     @GetMapping("/revenue/statistics")
-    public ResponseEntity<Map<String, Double>> getMonthlyRevenueStatistics() {
-        Map<String, Double> statistics = enrollmentService.getMonthlyRevenueStatistics();
+    public ResponseEntity<Map<String, Double>> getMonthlyRevenueStatistics(@RequestParam int year) {
+        Map<String, Double> statistics = enrollmentService.getMonthlyRevenueStatistics(year);
         return ResponseEntity.ok(statistics);
     }
+
 
     @GetMapping("/checkEnrollment")
     public ResponseObject<?> checkEnrollment(@RequestParam("userId") Integer userId, @RequestParam("courseId") Integer courseId) {
