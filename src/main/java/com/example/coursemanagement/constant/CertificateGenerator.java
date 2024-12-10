@@ -5,6 +5,7 @@ import com.itextpdf.text.pdf.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,7 +45,8 @@ public class CertificateGenerator {
 
         document.open();
 
-        Image background = Image.getInstance("C:/Users/phuct/DATN/quanLyKhoaHocStar/public/certificate/Certificate-bg.png");
+        URL url = new URL("http://18.176.84.130/certificate/Certificate-bg.png");
+        Image background = Image.getInstance(url);
 
         float imgWidth = background.getWidth();
         float imgHeight = background.getHeight();
@@ -86,7 +88,7 @@ public class CertificateGenerator {
 
     public static void main(String[] args) {
         try {
-            String certificateFilePath = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\certificate\\certificate_half_height.pdf";
+            String certificateFilePath = "/var/www/stardev/html/certificate/certificate_half_height.pdf";
 
             generateCertificate("Lê Thanh Tùng", "Kiểm thử dự án trên nền tảng web và di động", certificateFilePath);
             System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);

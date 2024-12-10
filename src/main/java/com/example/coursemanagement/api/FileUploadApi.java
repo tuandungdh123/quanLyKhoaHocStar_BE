@@ -23,7 +23,7 @@ public class FileUploadApi {
     public ResponseEntity<?> uploadBackgroundCourse(@RequestParam("file") MultipartFile file) {
         try {
             // Cập nhật đường dẫn mới cho ảnh background
-            String uploadDir = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\background-course";
+            String uploadDir = "http://18.176.84.130/background-course";
             Path uploadPath = Paths.get(uploadDir);
 
             // Kiểm tra và tạo thư mục nếu chưa có
@@ -57,7 +57,7 @@ public class FileUploadApi {
         }
         try {
             // Cập nhật đường dẫn mới cho ảnh avatar
-            String uploadDir = "C:\\Users\\phuct\\DATN\\quanLyKhoaHocStar\\public\\Avatar-Account";
+            String uploadDir = "http://18.176.84.130/Avatar-Account";
             Path uploadPath = Paths.get(uploadDir);
 
             // Kiểm tra và tạo thư mục nếu chưa có
