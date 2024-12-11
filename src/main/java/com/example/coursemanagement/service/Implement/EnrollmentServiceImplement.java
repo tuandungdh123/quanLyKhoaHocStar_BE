@@ -13,9 +13,14 @@ import com.example.coursemanagement.repository.CourseRepository;
 import com.example.coursemanagement.repository.EnrollmentRepository;
 import com.example.coursemanagement.repository.UserRepository;
 import com.example.coursemanagement.service.EnrollmentService;
+import com.example.coursemanagement.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +35,7 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+    private final S3Service s3Service;
 
     @Override
     public List<EnrollmentDTO> getAllEnrollments() {
@@ -152,6 +158,22 @@ public class EnrollmentServiceImplement implements EnrollmentService {
             System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);
         } catch (Exception e) {
             throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to generate certificate: " + e.getMessage());
+        }
+        // Tải chứng chỉ lên S3
+        try (InputStream fileInputStream = new FileInputStream(certificateFilePath)) {
+            // Tạo key (tên file) cho file trên S3
+            String s3Key = "certificate/certificate_" + enrollmentId + ".pdf";
+
+            // Tải lên S3
+            String fileUrl = s3Service.uploadFile(s3Key, fileInputStream, new File(certificateFilePath).length());
+
+            // Cập nhật URL của chứng chỉ trong EnrollmentEntity
+            enrollment.setCertificateUrl(fileUrl);
+            enrollmentRepository.save(enrollment);
+
+            System.out.println("Chứng chỉ đã được tải lên S3: " + fileUrl);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to upload certificate to S3: " + e.getMessage());
         }
 
         enrollmentRepository.save(enrollment);
