@@ -1,5 +1,7 @@
 package com.example.coursemanagement.service;
 
 public interface CertificateEmailService {
-    void sendCertificateEmail(String toEmail, String userName, String courseTitle, byte[] certificateImage);
+//    void sendCertificateWithAttachment(String toEmail, String userName, String courseName);
+
+    void sendCertificateEmail(String toEmail, String userName, String courseTitle, byte[] certificateFile);
 }
