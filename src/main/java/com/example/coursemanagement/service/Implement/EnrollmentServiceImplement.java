@@ -13,13 +13,9 @@ import com.example.coursemanagement.repository.CourseRepository;
 import com.example.coursemanagement.repository.EnrollmentRepository;
 import com.example.coursemanagement.repository.UserRepository;
 import com.example.coursemanagement.service.EnrollmentService;
-import com.example.coursemanagement.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
-import java.io.*;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +30,6 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
-    private final S3Service s3Service;
-    private final CertificateEmailImplement certificateEmailImplement;
 
     @Override
     public List<EnrollmentDTO> getAllEnrollments() {
@@ -158,36 +152,6 @@ public class EnrollmentServiceImplement implements EnrollmentService {
             System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);
         } catch (Exception e) {
             throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to generate certificate: " + e.getMessage());
-        }
-        try (InputStream fileInputStream = new FileInputStream(certificateFilePath)) {
-            // Upload chứng chỉ lên S3
-            String s3Key = "certificate/certificate_" + enrollmentId + ".pdf";
-            String fileUrl = s3Service.uploadFile(s3Key, fileInputStream, new File(certificateFilePath).length());
-
-            // Cập nhật URL chứng chỉ trong EnrollmentEntity
-            enrollment.setCertificateUrl(fileUrl);
-
-            // Lưu Enrollment
-            enrollmentRepository.save(enrollment);
-            System.out.println("Chứng chỉ đã được tải lên S3: " + fileUrl);
-
-            // Gửi chứng chỉ qua email trực tiếp từ file đã tạo
-            try (FileInputStream certificateFile = new FileInputStream(certificateFilePath)) {
-                byte[] certificateBytes = certificateFile.readAllBytes();
-
-                // Gửi chứng chỉ qua email
-                certificateEmailImplement.sendCertificateEmail(
-                        enrollment.getUser().getEmail(),
-                        enrollment.getUser().getName(),
-                        enrollment.getCourse().getTitle(),
-                        certificateBytes
-                );
-                System.out.println("Chứng chỉ đã được gửi qua email cho người dùng: " + enrollment.getUser().getEmail());
-            } catch (IOException e) {
-                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to read generated certificate file: " + e.getMessage());
-            }
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to upload certificate to S3: " + e.getMessage());
         }
 
         enrollmentRepository.save(enrollment);

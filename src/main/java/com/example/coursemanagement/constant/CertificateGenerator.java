@@ -45,7 +45,7 @@ public class CertificateGenerator {
 
         document.open();
 
-        URL url = new URL("file:///D:/React/DATN/quanLyKhoaHocStar/public/certificate/Certificate-bg.png");
+        URL url = new URL("http://18.176.84.130/certificate/Certificate-bg.png");
         Image background = Image.getInstance(url);
 
         float imgWidth = background.getWidth();
