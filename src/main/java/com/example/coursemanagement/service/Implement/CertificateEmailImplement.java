@@ -1,5 +1,7 @@
 package com.example.coursemanagement.service.Implement;
 
+import com.example.coursemanagement.exception.AppException;
+import com.example.coursemanagement.exception.ErrorCode;
 import com.example.coursemanagement.service.CertificateEmailService;
 import jakarta.activation.DataSource;
 import jakarta.mail.MessagingException;
@@ -10,50 +12,41 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Service
 public class CertificateEmailImplement implements CertificateEmailService {
     @Autowired
     private JavaMailSender mailSender;
 
     @Override
-    public void sendCertificateEmail(String toEmail, String userName, String courseTitle, byte[] certificateImage) {
+    public void sendCertificateEmail(String toEmail, String userName, String courseName, byte[] certificateBytes) {
         try {
+            // Thiết lập email
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            // Cài đặt thông tin email
+            // Cài đặt các thông tin cơ bản cho email
             helper.setTo(toEmail);
-            helper.setSubject("Chứng nhận hoàn thành khóa học");
+            helper.setSubject("Chứng chỉ khóa học: " + courseName);
+            helper.setText("Chào " + userName + ",\n\nChúng tôi vui mừng thông báo bạn đã hoàn thành khóa học: " + courseName + ".\n\nChứng chỉ của bạn đính kèm trong email này.");
 
-            // Nội dung HTML của email
-            String htmlContent =
-                    "<div style='font-family:Arial, sans-serif; color:#333;'>" +
-                            "<h2 style='color: #4CAF50;'>Chứng nhận hoàn thành khóa học</h2>" +
-                            "<p>Xin chào, <strong>" + userName + "</strong>,</p>" +
-                            "<p>Bạn đã hoàn thành khóa học <strong>" + courseTitle + "</strong>. Xin chúc mừng!</p>" +
-                            "<p>Đính kèm là chứng nhận của bạn.</p>" +
-                            "<p><img src='cid:certificateImage' alt='Chứng nhận' style='width:100%; max-width:600px;'></p>" +
-                            "<hr>" +
-                            "<p style='font-size:0.9em;'>Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.</p>" +
-                            "<p>Trân trọng,<br>Đội ngũ hỗ trợ của StarDev</p>" +
-                            "</div>";
-
-            helper.setText(htmlContent, true);
-
-            // Đính kèm tệp ảnh dưới dạng CID (Content-ID)
-            DataSource dataSource = new ByteArrayDataSource(certificateImage, "image/png");
-            helper.addInline("certificateImage", dataSource); // Sử dụng addInline thay vì addAttachment
+            // Kiểm tra và đính kèm file chứng chỉ
+            if (certificateBytes != null && certificateBytes.length > 0) {
+                // Tạo ByteArrayDataSource từ byte array
+                DataSource dataSource = new ByteArrayDataSource(certificateBytes, "application/pdf");
+                helper.addAttachment("certificate_" + userName + ".pdf", dataSource);
+            } else {
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "No certificate available to attach.");
+            }
 
             // Gửi email
             mailSender.send(message);
-            System.out.println("Chứng nhận đã được gửi thành công đến: " + toEmail);
-
+            System.out.println("Chứng chỉ đã được gửi qua email cho người dùng: " + toEmail);
         } catch (MessagingException e) {
-            System.err.println("Lỗi khi gửi email: " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("Lỗi không xác định: " + e.getMessage());
-            e.printStackTrace();
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to send email with certificate: " + e.getMessage());
         }
     }
 }
