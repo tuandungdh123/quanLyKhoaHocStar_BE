@@ -13,9 +13,11 @@ import com.example.coursemanagement.repository.CourseRepository;
 import com.example.coursemanagement.repository.EnrollmentRepository;
 import com.example.coursemanagement.repository.UserRepository;
 import com.example.coursemanagement.service.EnrollmentService;
+import com.example.coursemanagement.aws.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,8 @@ public class EnrollmentServiceImplement implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+    private final S3Service s3Service;
+    private final CertificateEmailImplement certificateEmailImplement;
 
     @Override
     public List<EnrollmentDTO> getAllEnrollments() {
@@ -145,16 +149,35 @@ public class EnrollmentServiceImplement implements EnrollmentService {
 
         enrollment.completeCourse(certificateUrl);
 
-        // Cập nhật đường dẫn chứng chỉ với đường dẫn đúng trên EC2
-        String certificateFilePath = "/var/www/stardev/html/certificate/certificate_" + enrollmentId + ".pdf";
+        // Tạo chứng chỉ dưới dạng ByteArrayOutputStream
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            CertificateGenerator.generateCertificate(enrollment.getUser().getName(), enrollment.getCourse().getTitle(), certificateFilePath);
-            System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);
+            CertificateGenerator.generateCertificate(enrollment.getUser().getName(), enrollment.getCourse().getTitle(), outputStream);
+//            System.out.println("Chứng chỉ PDF đã được tạo thành công trong bộ nhớ.");
         } catch (Exception e) {
             throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to generate certificate: " + e.getMessage());
         }
 
-        enrollmentRepository.save(enrollment);
+        // Upload lên S3 trực tiếp từ bộ nhớ
+        String s3Key = "certificate/certificate_" + "userId_" + enrollment.getUser().getUserId() + "_" + enrollmentId + ".pdf";
+        try (InputStream certificateInputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
+            String fileUrl = s3Service.uploadFile(s3Key, certificateInputStream, outputStream.size());
+
+            enrollment.setCertificateUrl(fileUrl);
+            enrollmentRepository.save(enrollment);
+//            System.out.println("Chứng chỉ đã được tải lên S3: " + fileUrl);
+
+            // Gửi email với chứng chỉ
+            certificateEmailImplement.sendCertificateEmail(
+                    enrollment.getUser().getEmail(),
+                    enrollment.getUser().getName(),
+                    enrollment.getCourse().getTitle(),
+                    outputStream.toByteArray()
+            );
+//            System.out.println("Chứng chỉ đã được gửi qua email cho người dùng: " + enrollment.getUser().getEmail());
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to upload certificate to S3 or send email: " + e.getMessage());
+        }
 
         return convertToDTO(enrollment);
     }

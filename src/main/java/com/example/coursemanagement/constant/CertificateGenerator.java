@@ -2,9 +2,9 @@ package com.example.coursemanagement.constant;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import java.io.File;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
@@ -19,33 +19,25 @@ public class CertificateGenerator {
         }
 
         String temp = Normalizer.normalize(input, Normalizer.Form.NFD);
-
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         String result = pattern.matcher(temp).replaceAll("");
 
-        result = result.replace('đ', 'd').replace('Đ', 'D');
-
-        return result;
+        return result.replace('đ', 'd').replace('Đ', 'D');
     }
 
-    public static void generateCertificate(String userName, String courseName, String certificateFilePath) throws DocumentException, IOException {
-
+    public static void generateCertificate(String userName, String courseName, OutputStream outputStream) throws DocumentException, IOException, IOException {
         userName = removeVietnameseAccents(userName);
         courseName = removeVietnameseAccents(courseName);
-
-        File directory = new File(certificateFilePath).getParentFile();
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
 
         Rectangle halfA4 = new Rectangle(PageSize.A4.getWidth(), PageSize.A4.getHeight() / 2);
         Document document = new Document(halfA4);
 
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(certificateFilePath));
+        PdfWriter writer = PdfWriter.getInstance(document, outputStream);
 
         document.open();
 
-        URL url = new URL("http://18.176.84.130/certificate/Certificate-bg.png");
+        // Thêm hình nền
+        URL url = new URL("file:///C:/Users/phuct/DATN/quanLyKhoaHocStar/public/certificate/Certificate-bg.png");
         Image background = Image.getInstance(url);
 
         float imgWidth = background.getWidth();
@@ -59,22 +51,26 @@ public class CertificateGenerator {
         background.setAbsolutePosition(xPosition, yPosition);
         document.add(background);
 
+        // Font chữ
         BaseFont baseFont = BaseFont.createFont("C:/Windows/Fonts/arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-        BaseColor customColor = new BaseColor(140, 118, 118); // Màu #8c7676
+        BaseColor customColor = new BaseColor(140, 118, 118);
         Font headerFont = new Font(baseFont, 24, Font.BOLD, customColor);
         Font contentFont = new Font(baseFont, 18, Font.BOLD, customColor);
         Font dateFont = new Font(baseFont, 12, Font.NORMAL, customColor);
 
+        // Tên người nhận
         Paragraph recipient = new Paragraph(userName, headerFont);
         recipient.setAlignment(Element.ALIGN_CENTER);
         recipient.setSpacingBefore(130);
         document.add(recipient);
 
-        Paragraph course = new Paragraph( courseName, contentFont);
+        // Tên khóa học
+        Paragraph course = new Paragraph(courseName, contentFont);
         course.setAlignment(Element.ALIGN_CENTER);
         course.setSpacingBefore(30);
         document.add(course);
 
+        // Ngày cấp chứng chỉ
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String currentDate = sdf.format(new Date());
         Paragraph date = new Paragraph(currentDate, dateFont);
@@ -88,10 +84,9 @@ public class CertificateGenerator {
 
     public static void main(String[] args) {
         try {
-            String certificateFilePath = "/var/www/stardev/html/certificate/certificate_half_height.pdf";
-
-            generateCertificate("Lê Thanh Tùng", "Kiểm thử dự án trên nền tảng web và di động", certificateFilePath);
-            System.out.println("Chứng chỉ PDF đã được tạo thành công tại: " + certificateFilePath);
+            OutputStream outputStream = System.out;
+            generateCertificate("Lê Thanh Tùng", "Kiểm thử dự án trên nền tảng web và di động", outputStream);
+            System.out.println("Chứng chỉ PDF đã được tạo thành công.");
         } catch (Exception e) {
             System.out.println("Có lỗi xảy ra khi tạo chứng chỉ PDF: " + e.getMessage());
         }

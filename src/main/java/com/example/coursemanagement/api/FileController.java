@@ -1,6 +1,6 @@
 package com.example.coursemanagement.api;
 
-import com.example.coursemanagement.service.S3Service;
+import com.example.coursemanagement.aws.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
