@@ -133,53 +133,53 @@ public class EnrollmentApi {
         return resultApi;
     }
 
-    @GetMapping("/statistics")
-    public ResponseObject<?> getEnrollmentStatisticsByCoursePrice() {
-        var resultApi = new ResponseObject<>();
-        try {
-            var statistics = enrollmentService.getEnrollmentStatisticsByCoursePrice();
-            resultApi.setData(statistics);
-            resultApi.setSuccess(true);
-            resultApi.setMessage("Fetched enrollment statistics successfully");
-        } catch (Exception e) {
-            resultApi.setSuccess(false);
-            resultApi.setMessage(e.getMessage());
-            log.error("Failed to get enrollment statistics", e);
-        }
-        return resultApi;
-    }
+//    @GetMapping("/statistics")
+//    public ResponseObject<?> getEnrollmentStatisticsByCoursePrice() {
+//        var resultApi = new ResponseObject<>();
+//        try {
+//            var statistics = enrollmentService.getEnrollmentStatisticsByCoursePrice();
+//            resultApi.setData(statistics);
+//            resultApi.setSuccess(true);
+//            resultApi.setMessage("Fetched enrollment statistics successfully");
+//        } catch (Exception e) {
+//            resultApi.setSuccess(false);
+//            resultApi.setMessage(e.getMessage());
+//            log.error("Failed to get enrollment statistics", e);
+//        }
+//        return resultApi;
+//    }
 
-    @GetMapping("/years")
-    public ResponseObject<?> getAvailableYears() {
-        var resultApi = new ResponseObject<>();
-        try {
-            var years = enrollmentService.getAvailableYears();
-            resultApi.setData(years);
-            resultApi.setSuccess(true);
-            resultApi.setMessage("Fetched enrollment statistics successfully");
-        } catch (Exception e) {
-            resultApi.setSuccess(false);
-            resultApi.setMessage(e.getMessage());
-            log.error("Failed to get enrollment statistics", e);
-        }
-        return resultApi;
-    }
+//    @GetMapping("/years")
+//    public ResponseObject<?> getAvailableYears() {
+//        var resultApi = new ResponseObject<>();
+//        try {
+//            var years = enrollmentService.getAvailableYears();
+//            resultApi.setData(years);
+//            resultApi.setSuccess(true);
+//            resultApi.setMessage("Fetched enrollment statistics successfully");
+//        } catch (Exception e) {
+//            resultApi.setSuccess(false);
+//            resultApi.setMessage(e.getMessage());
+//            log.error("Failed to get enrollment statistics", e);
+//        }
+//        return resultApi;
+//    }
 
-    @GetMapping("/revenue/statistics")
-    public ResponseObject<?> getMonthlyRevenueStatistics(@RequestParam int year) {
-        var resultApi = new ResponseObject<>();
-        try {
-            var statistics = enrollmentService.getMonthlyRevenueStatistics(year);
-            resultApi.setData(statistics);
-            resultApi.setSuccess(true);
-            resultApi.setMessage("Fetched monthly revenue statistics successfully");
-        } catch (Exception e) {
-            resultApi.setSuccess(false);
-            resultApi.setMessage(e.getMessage());
-            log.error("Failed to get monthly revenue statistics", e);
-        }
-        return resultApi;
-    }
+//    @GetMapping("/revenue/statistics")
+//    public ResponseObject<?> getMonthlyRevenueStatistics(@RequestParam int year) {
+//        var resultApi = new ResponseObject<>();
+//        try {
+//            var statistics = enrollmentService.getMonthlyRevenueStatistics(year);
+//            resultApi.setData(statistics);
+//            resultApi.setSuccess(true);
+//            resultApi.setMessage("Fetched monthly revenue statistics successfully");
+//        } catch (Exception e) {
+//            resultApi.setSuccess(false);
+//            resultApi.setMessage(e.getMessage());
+//            log.error("Failed to get monthly revenue statistics", e);
+//        }
+//        return resultApi;
+//    }
 
 
     @GetMapping("/checkEnrollment")
