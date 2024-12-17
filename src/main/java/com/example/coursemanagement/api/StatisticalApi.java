@@ -140,4 +140,21 @@ public class StatisticalApi {
         return resultApi;
     }
 
+    @GetMapping("/revenue/today")
+    public ResponseObject<?> getTodayRevenue() {
+        var resultApi = new ResponseObject<>();
+        try {
+            var todayRevenue = statisticalService.getTodayRevenue();
+            resultApi.setData(todayRevenue);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Fetched today's revenue successfully");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Failed to get today's revenue", e);
+        }
+        return resultApi;
+    }
+
+
 }

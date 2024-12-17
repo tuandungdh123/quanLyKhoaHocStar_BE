@@ -20,4 +20,9 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
 
     @Query("SELECT SUM(p.amount) FROM PaymentEntity p WHERE p.paymentStatus = 'completed'")
     Long calculateTotalRevenue();
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) " +
+            "FROM PaymentEntity p " +
+            "WHERE p.paymentStatus = 'completed' AND DATE(p.paymentDate) = CURRENT_DATE")
+    Long calculateTodayRevenue();
 }

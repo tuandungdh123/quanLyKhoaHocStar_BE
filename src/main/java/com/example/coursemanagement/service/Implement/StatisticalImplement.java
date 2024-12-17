@@ -75,4 +75,10 @@ public class StatisticalImplement implements StatisticalService {
         return paymentRepository.calculateTotalRevenue();
     }
 
+    @Override
+    public Long getTodayRevenue() {
+        return paymentRepository.calculateTodayRevenue();
+    }
+
+
 }

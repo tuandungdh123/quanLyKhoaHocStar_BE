@@ -13,4 +13,5 @@ public interface StatisticalService {
     Map<String, Long> getMonthlyRevenueStatistics(int year);
     List<Integer> getAvailableRevenueYears();
     Long getTotalRevenue();
+    Long getTodayRevenue();
 }
