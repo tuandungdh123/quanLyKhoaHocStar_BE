@@ -11,6 +11,8 @@ import com.example.coursemanagement.service.MeetingScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,19 @@ public class MeetScheduleServiceImplement implements MeetingScheduleService {
 
     @Override
     public MeetingScheduleDTO createMeetingSchedule(MeetingScheduleDTO dto) {
+        System.out.println("urlMeeting: " + dto.getUrlMeeting());
+        // Kiểm tra nếu URL không hợp lệ
+        if (dto.getUrlMeeting() == null || dto.getUrlMeeting().trim().isEmpty()) {
+            throw new IllegalArgumentException("URL Meeting không được để trống!");
+        }
+
+        // Validate URL hợp lệ (nếu cần thiết)
+        try {
+            new URL(dto.getUrlMeeting());
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("URL không hợp lệ!");
+        }
+
         MeetingScheduleEntity entity = convertToEntity(dto);
         MeetingScheduleEntity savedEntity = meetingScheduleRepository.save(entity);
         return convertToDTO(savedEntity);
@@ -64,10 +79,12 @@ public class MeetScheduleServiceImplement implements MeetingScheduleService {
     }
 
     private MeetingScheduleDTO convertToDTO(MeetingScheduleEntity entity) {
+
         return new MeetingScheduleDTO(
                 entity.getMeetingId(),
                 entity.getCourse().getCourseId(),
                 entity.getMeetingDate(),
+                entity.getUrlMeeting(),
                 entity.getCreatedAt()
         );
     }
@@ -80,8 +97,24 @@ public class MeetScheduleServiceImplement implements MeetingScheduleService {
         entity.setMeetingId(dto.getMeetingId());
         entity.setCourse(course);
         entity.setMeetingDate(dto.getMeetingDate());
+        entity.setUrlMeeting(dto.getUrlMeeting());
         entity.setCreatedAt(dto.getCreatedAt());
 
         return entity;
     }
+    @Override
+    public List<MeetingScheduleDTO> getMeetingSchedulesByCourseId(Integer courseId) {
+        // Kiểm tra xem khóa học có tồn tại hay không
+        courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND, "Không tìm thấy khóa học nào."));
+
+        // Tìm danh sách lịch học theo khóa học
+        List<MeetingScheduleEntity> meetingSchedules = meetingScheduleRepository.findByCourse_CourseId(courseId);
+
+        if (meetingSchedules.isEmpty()) {
+            throw new AppException(ErrorCode.MEET_SCHEDULE_NOT_FOUND, "Không tìm thấy lịch họp nào cho khóa học này.");
+        }
+
+        return meetingSchedules.stream().map(this::convertToDTO).collect(Collectors.toList());
+}
 }

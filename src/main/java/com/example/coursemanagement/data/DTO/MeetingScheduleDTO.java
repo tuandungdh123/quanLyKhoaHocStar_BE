@@ -15,6 +15,6 @@ public class MeetingScheduleDTO {
     private Integer meetingId;
     private Integer courseId;
     private LocalDateTime meetingDate;
+    private String urlMeeting;
     private LocalDateTime createdAt;
-
 }

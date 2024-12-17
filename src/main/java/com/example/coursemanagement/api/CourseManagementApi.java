@@ -4,11 +4,14 @@ package com.example.coursemanagement.api;
 import com.example.coursemanagement.constant.ApiMessage;
 import com.example.coursemanagement.data.DTO.CourseDTO;
 import com.example.coursemanagement.data.mgt.ResponseObject;
+import com.example.coursemanagement.exception.AppException;
 import com.example.coursemanagement.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -97,6 +100,22 @@ public class CourseManagementApi {
             resultApi.setSuccess(false);
             resultApi.setMessage(ApiMessage.BasicMessageApi.FAIL.getBasicMessageApi());
             log.error("Failed to update course: ", e);
+        }
+        return resultApi;
+    }
+
+    @GetMapping("/getCoursesByInstructorId")
+    public ResponseObject<?> getCoursesByInstructorId(@RequestParam Integer instructorId) {
+        var resultApi = new ResponseObject<>();
+        try {
+            List<CourseDTO> courses = courseService.getCourseByInstructorId(instructorId);
+            resultApi.setData(courses);
+            resultApi.setSuccess(true);
+            resultApi.setMessage(ApiMessage.BasicMessageApi.SUCCESS.getBasicMessageApi());
+        } catch (AppException e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Lỗi khi gọi API getCoursesByInstructorId: ", e);
         }
         return resultApi;
     }

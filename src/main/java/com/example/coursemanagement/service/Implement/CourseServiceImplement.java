@@ -162,5 +162,26 @@ public class CourseServiceImplement implements CourseService {
         return courseEntity;
     }
 
+    @Override
+    public List<CourseDTO> getCourseByInstructorId(Integer instructorId) throws AppException {
+        // Kiểm tra giảng viên có tồn tại không
+        UserEntity instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Không tìm thấy giảng viên với ID: " + instructorId));
+
+        // Kiểm tra vai trò của người dùng
+        if (instructor.getRole().getRoleId() != 2) {
+            throw new AppException(ErrorCode.INVALID_INSTRUCTOR, "Người dùng không phải là giảng viên hợp lệ");
+        }
+
+        // Lấy danh sách khóa học dựa trên instructor
+        List<CourseEntity> courses = courseRepository.findByInstructor(instructor);
+
+        if (courses.isEmpty()) {
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND, "Giảng viên này chưa tạo khóa học nào");
+        }
+
+        // Chuyển đổi danh sách sang DTO
+        return courses.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
 
 }

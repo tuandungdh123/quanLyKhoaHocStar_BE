@@ -16,4 +16,6 @@ public interface CourseService {
     void deleteCourseById(Integer courseId) throws SQLException, AppException;
 
     CourseDTO getCourseById(Integer courseId);
+
+    List<CourseDTO> getCourseByInstructorId(Integer instructorId) throws AppException;
 }
