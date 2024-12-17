@@ -231,39 +231,4 @@ public class EnrollmentServiceImplement implements EnrollmentService {
         return entity;
     }
 
-    @Override
-    public Map<String, Long> getEnrollmentStatisticsByCoursePrice() {
-        long freeCoursesCount = enrollmentRepository.countFreeCourses();
-        long proCoursesCount = enrollmentRepository.countProCourses();
-
-        Map<String, Long> statistics = new HashMap<>();
-        statistics.put("Free Courses", freeCoursesCount);
-        statistics.put("Pro Courses", proCoursesCount);
-
-        return statistics;
-    }
-
-    @Override
-    public Map<String, Double> getMonthlyRevenueStatistics() {
-        return getMonthlyRevenueStatistics(LocalDate.now().getYear());
-    }
-
-    @Override
-    public List<Integer> getAvailableYears() {
-        return enrollmentRepository.findDistinctYears();
-    }
-
-    @Override
-    public Map<String, Double> getMonthlyRevenueStatistics(int year) {
-        List<Object[]> results = enrollmentRepository.calculateMonthlyRevenue(year);
-        Map<String, Double> statistics = new HashMap<>();
-
-        for (Object[] result : results) {
-            Integer month = (Integer) result[0];
-            Double totalRevenue = (Double) result[1];
-            statistics.put("Month " + month, totalRevenue);
-        }
-
-        return statistics;
-    }
 }

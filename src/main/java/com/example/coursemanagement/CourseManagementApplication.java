@@ -13,6 +13,9 @@ public class CourseManagementApplication {
                 .load();
 
         // Set properties for Spring Environment
+//        System.setProperty("SV_DB_URL", dotenv.get("SV_DB_URL"));
+//        System.setProperty("SV_DB_USERNAME", dotenv.get("SV_DB_USERNAME"));
+//        System.setProperty("SV_DB_PASSWORD", dotenv.get("SV_DB_PASSWORD"));
         System.setProperty("L_DB_URL", dotenv.get("L_DB_URL"));
         System.setProperty("L_DB_USERNAME", dotenv.get("L_DB_USERNAME"));
         System.setProperty("L_DB_PASSWORD", dotenv.get("L_DB_PASSWORD"));
