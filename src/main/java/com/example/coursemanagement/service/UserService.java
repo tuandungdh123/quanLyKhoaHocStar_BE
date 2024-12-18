@@ -1,8 +1,8 @@
 package com.example.coursemanagement.service;
 
 import com.example.coursemanagement.data.DTO.PasswordChangeDTO;
+import com.example.coursemanagement.data.DTO.PasswordResetDTO;
 import com.example.coursemanagement.data.DTO.UserDTO;
-import com.example.coursemanagement.data.entity.UserEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +18,9 @@ public interface UserService {
     void updateUser(UserDTO userDTO);
     void changePassword(PasswordChangeDTO passwordChangeDTO);
     void sendOtpEmailToUser(String email, String otpCode);
+
+    void resetPassword(PasswordResetDTO passwordResetDTO);
+
     void sendOtpEmail(String toEmail);
     boolean verifyOtp(String email, String otp);
     Map<String, Long> getUserRegistrationStatisticsByMonth();
