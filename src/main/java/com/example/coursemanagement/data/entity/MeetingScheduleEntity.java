@@ -23,6 +23,9 @@ public class MeetingScheduleEntity {
     @Column(name = "meeting_date", nullable = false)
     private LocalDateTime meetingDate;
 
+    @Column(name = "url_meeting", nullable = true)
+    private String urlMeeting;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -90,4 +90,18 @@ public class MeetingScheduleApi {
         }
         return resultApi;
     }
+
+        @GetMapping("/getMeetingSchedulesByCourseId")
+        public ResponseObject<?> getMeetingSchedulesByCourseId(@RequestParam Integer courseId) {
+            var resultApi = new ResponseObject<>();
+            try {
+                resultApi.setData(meetingScheduleService.getMeetingSchedulesByCourseId(courseId));
+                resultApi.setSuccess(true);
+                resultApi.setMessage("getMeetingSchedulesByCourseId success");
+            } catch (Exception e) {
+                resultApi.setSuccess(false);
+                resultApi.setMessage(e.getMessage());
+            }
+            return resultApi;
+        }
 }
