@@ -1,12 +1,11 @@
 package com.example.coursemanagement.api;
 
 import com.example.coursemanagement.data.DTO.PasswordChangeDTO;
+import com.example.coursemanagement.data.DTO.PasswordResetDTO;
 import com.example.coursemanagement.data.DTO.UserDTO;
 import com.example.coursemanagement.data.DTO.VerifyOtpRequestDTO;
-import com.example.coursemanagement.data.entity.UserEntity;
 import com.example.coursemanagement.data.mgt.ResponseObject;
 import com.example.coursemanagement.exception.AppException;
-import com.example.coursemanagement.repository.UserRepository;
 import com.example.coursemanagement.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 
-import static java.rmi.server.LogStream.log;
 
 @Slf4j
 @RestController
@@ -184,6 +181,28 @@ public class UserApi {
             resultApi.setSuccess(false);
             resultApi.setMessage(e.getMessage());
             UserApi.log.error("Fail When Call API user-api/changePassword", e);
+        }
+        return resultApi;
+    }
+    @PutMapping("/resetPassword")
+    public ResponseObject<?> resetPassword(@RequestBody PasswordResetDTO passwordResetDTO) {
+        var resultApi = new ResponseObject<>();
+        try {
+            boolean otpValid = userService.verifyOtp(passwordResetDTO.getEmail(), passwordResetDTO.getOtp());
+
+            if (!otpValid) {
+                resultApi.setSuccess(false);
+                resultApi.setMessage("Invalid OTP or OTP has expired.");
+                return resultApi;
+            }
+
+            userService.resetPassword(passwordResetDTO);
+            resultApi.setSuccess(true);
+            resultApi.setMessage("Password reset successful.");
+        } catch (Exception e) {
+            resultApi.setSuccess(false);
+            resultApi.setMessage(e.getMessage());
+            log.error("Fail when calling API user-api/resetPassword", e);
         }
         return resultApi;
     }

@@ -2,6 +2,7 @@ package com.example.coursemanagement.service.Implement;
 
 import com.example.coursemanagement.constant.OtpInfo;
 import com.example.coursemanagement.data.DTO.PasswordChangeDTO;
+import com.example.coursemanagement.data.DTO.PasswordResetDTO;
 import com.example.coursemanagement.data.DTO.UserDTO;
 import com.example.coursemanagement.data.entity.RoleEntity;
 import com.example.coursemanagement.data.entity.UserEntity;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -137,6 +139,20 @@ public class UserServiceImplement implements UserService {
             throw new AppException(ErrorCode.USER_NOT_FOUND, "Không tìm thấy người dùng");
         }
     }
+
+    @Override
+    public void resetPassword(PasswordResetDTO passwordResetDTO) {
+        Optional<UserEntity> userOpt = userRepository.findByEmail(passwordResetDTO.getEmail());
+        if (!userOpt.isPresent()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, "User not found.");
+        }
+        UserEntity user = userOpt.get();
+        String encodedPassword = passwordEncoder.encode(passwordResetDTO.getNewPassword());
+        user.setPasswordHash(encodedPassword);
+        userRepository.save(user);
+}
+
+
 
     @Override
     public void sendOtpEmail(String email) {

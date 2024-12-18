@@ -31,6 +31,7 @@ public enum ErrorCode {
     DUPLICATE_SUBMISSION(2020, "Lịch sử nộp bài đã tồn tại"),
     EMAIL_ALREADY_EXISTS(2021, "Email đã được đăng ký trên he thống"),
     PHONE_ALREADY_EXISTS(2022, "Số điện thoại đã được đăng ký trên hệ thống"),
+    INVALID_OTP(2023,"Mã OTP không hợp lệ")
     ;
 
 
